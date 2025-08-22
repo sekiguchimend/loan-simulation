@@ -12,10 +12,11 @@ class LoanSimulatorScreen extends HookConsumerWidget {
     final previousValue = useState<double?>(null);
     final operation = useState<String?>(null);
     final isNewInput = useState(true);
-    final loanStep = useState(0); // 0: 借入額, 1: 金利, 2: 返済月数
+    final loanStep = useState(-1); // -1: 初期状態, 0: 借入額, 1: 金利, 2: 返済月数, 3: 結果表示
     final loanAmount = useState<double?>(null);
     final interestRate = useState<double?>(null);
     final loanMonths = useState<double?>(null);
+    final monthlyPaymentResult = useState<double?>(null);
 
     void onNumberPressed(String number) {
       if (isNewInput.value) {
@@ -27,6 +28,12 @@ class LoanSimulatorScreen extends HookConsumerWidget {
         } else {
           display.value += number;
         }
+      }
+      
+      // 結果表示中の場合は通常の計算機モードに戻る（ただし計算は継続可能）
+      if (loanStep.value == 3) {
+        loanStep.value = -1;
+        monthlyPaymentResult.value = null;
       }
     }
 
@@ -66,6 +73,12 @@ class LoanSimulatorScreen extends HookConsumerWidget {
         previousValue.value = double.tryParse(display.value);
         operation.value = op;
         isNewInput.value = true;
+        
+        // 結果表示中の場合は通常の計算機モードに戻る
+        if (loanStep.value == 3) {
+          loanStep.value = -1;
+          monthlyPaymentResult.value = null;
+        }
       }
     }
 
@@ -75,26 +88,45 @@ class LoanSimulatorScreen extends HookConsumerWidget {
         final monthlyRate = interestRate.value! / 100 / 12;
         final totalMonths = loanMonths.value!;
         
+        double monthlyPayment;
         if (monthlyRate == 0) {
           // 金利0%の場合
-          final monthlyPayment = principal / totalMonths;
-          display.value = '月額: ${monthlyPayment.toStringAsFixed(0)}円';
+          monthlyPayment = principal / totalMonths;
         } else {
-          final monthlyPayment = principal * 
+          monthlyPayment = principal * 
             (monthlyRate * pow(1 + monthlyRate, totalMonths)) / 
             (pow(1 + monthlyRate, totalMonths) - 1);
-          display.value = '月額: ${monthlyPayment.toStringAsFixed(0)}円';
         }
         
-        // 結果表示後は最初に戻る
-        loanStep.value = 0;
-        loanAmount.value = null;
-        interestRate.value = null;
-        loanMonths.value = null;
+        monthlyPaymentResult.value = monthlyPayment;
+        display.value = monthlyPayment.toStringAsFixed(0);
+        
+        // 結果表示状態に移行
+        loanStep.value = 3;
       }
     }
 
-    void onLoanNext() {
+    void onLoanButtonPressed() {
+      if (loanStep.value == -1) {
+        // 初期状態から借入額入力画面へ
+        loanStep.value = 0;
+        display.value = '0';
+        isNewInput.value = true;
+        return;
+      }
+
+      if (loanStep.value == 3) {
+        // 結果表示からリセット
+        loanStep.value = -1;
+        loanAmount.value = null;
+        interestRate.value = null;
+        loanMonths.value = null;
+        monthlyPaymentResult.value = null;
+        display.value = '0';
+        isNewInput.value = true;
+        return;
+      }
+
       final currentValue = double.tryParse(display.value);
       if (currentValue == null) return;
 
@@ -120,7 +152,7 @@ class LoanSimulatorScreen extends HookConsumerWidget {
 
     void clear() {
       // ローンシミュレーション中の場合は現在のステップのみクリア
-      if (loanStep.value > 0) {
+      if (loanStep.value >= 0 && loanStep.value < 3) {
         display.value = '0';
         isNewInput.value = true;
       } else {
@@ -129,32 +161,97 @@ class LoanSimulatorScreen extends HookConsumerWidget {
         previousValue.value = null;
         operation.value = null;
         isNewInput.value = true;
+        loanStep.value = -1;
         loanAmount.value = null;
         interestRate.value = null;
         loanMonths.value = null;
+        monthlyPaymentResult.value = null;
       }
     }
 
     String getDisplayLabel() {
       switch (loanStep.value) {
-        case 0: return '';
-        case 1: return '借入額: ${loanAmount.value?.toInt()}万円 → 金利(%)を入力';
-        case 2: return '金利: ${interestRate.value}% → 返済月数を入力';
+        case 0: return '借入額を入力してください';
+        case 1: return '利率(%)を入力してください';
+        case 2: return '返済月数を入力してください';
+        case 3: return '返済額(月)';
         default: return '';
       }
     }
 
-    String getDisplayText() {
-      String baseText = display.value;
+    String getLoanButtonText() {
+      switch (loanStep.value) {
+        case -1: return ''; // アイコンのみ
+        case 3: return 'OK'; // 結果表示後
+        default: return '次へ';
+      }
+    }
+
+    IconData? getLoanButtonIcon() {
+      return loanStep.value == -1 ? Icons.calculate : null;
+    }
+
+    Widget getDisplayText() {
+      List<Widget> children = [];
       
-      // 現在の演算子を表示
-      if (operation.value != null && !isNewInput.value) {
-        baseText += ' ${operation.value!}';
-      } else if (operation.value != null && isNewInput.value) {
-        baseText = '${previousValue.value} ${operation.value!}';
+      // メインの数字
+      children.add(
+        Text(
+          display.value,
+          style: const TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.w300,
+          ),
+        ),
+      );
+      
+      // 演算子を小さな角丸正方形で表示（新しい入力が始まっていない場合のみ）
+      if (operation.value != null && isNewInput.value) {
+        children.add(
+          const SizedBox(width: 8),
+        );
+        
+        // 全角演算子に変換
+        String displayOperator = operation.value!;
+        switch (operation.value!) {
+          case '+':
+            displayOperator = '＋';
+            break;
+          case '-':
+            displayOperator = '－';
+            break;
+          case '×':
+            displayOperator = '×';
+            break;
+          case '÷':
+            displayOperator = '÷';
+            break;
+        }
+        
+        children.add(
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              displayOperator,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
       }
       
-      return baseText;
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: children,
+      );
     }
 
     Widget buildButton({
@@ -162,33 +259,37 @@ class LoanSimulatorScreen extends HookConsumerWidget {
       required VoidCallback onPressed,
       Color? backgroundColor,
       Color? textColor,
+      IconData? icon,
+      bool isOperator = false,
     }) {
       return Expanded(
         child: Container(
-          margin: const EdgeInsets.all(1.5),
-          height: 65,
+          margin: const EdgeInsets.all(4),
+          height: 90,
           child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
-              backgroundColor: backgroundColor ?? const Color(0xFFE5E5E5), 
-              foregroundColor: textColor ?? const Color(0xFF2C2C2C),
+              backgroundColor: const Color(0xFFE5E5E5), 
+              foregroundColor: isOperator ? Theme.of(context).primaryColor : const Color(0xFF2C2C2C),
               shape: const CircleBorder(), 
               elevation: 0,
               padding: EdgeInsets.zero,
-              side: const BorderSide( 
-                color: Color(0xFFBBBBBB),
-                width: 0.5,
+              side: BorderSide( 
+                color: isOperator ? Theme.of(context).primaryColor : const Color(0xFFBBBBBB),
+                width: isOperator ? 1.5 : 0.5,
               ),
             ),
             child: Center(
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: text.length > 2 ? 14 : 22,
-                  fontWeight: FontWeight.w400,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              child: icon != null 
+                ? Icon(icon, size: 32)
+                : Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: (text == '次へ' || text == 'OK') ? 16 : 26,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
             ),
           ),
         ),
@@ -196,11 +297,8 @@ class LoanSimulatorScreen extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('電卓・ローンシミュレーター'),
-        centerTitle: true,
-      ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         children: [
           // Display Area
           Expanded(
@@ -213,21 +311,14 @@ class LoanSimulatorScreen extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (loanStep.value > 0) ...[
+                  if (loanStep.value >= 0 && loanStep.value <= 3) ...[
                     Text(
                       getDisplayLabel(),
                       style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 8),
                   ],
-                  Text(
-                    getDisplayText(),
-                    style: TextStyle(
-                      fontSize: display.value.contains('月額') ? 24 : 48,
-                      fontWeight: FontWeight.w300,
-                    ),
-                    maxLines: 2,
-                  ),
+                  getDisplayText(),
                 ],
               ),
             ),
@@ -237,7 +328,7 @@ class LoanSimulatorScreen extends HookConsumerWidget {
           Expanded(
             flex: 3,
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(4),
               child: Column(
                 children: [
                   // Row 1: AC, +/-, %, ÷
@@ -277,8 +368,7 @@ class LoanSimulatorScreen extends HookConsumerWidget {
                         buildButton(
                           text: '÷',
                           onPressed: () => onOperationPressed('÷'),
-                          backgroundColor: const Color(0xFFB85450),
-                          textColor: Colors.white,
+                          isOperator: true,
                         ),
                       ],
                     ),
@@ -294,8 +384,7 @@ class LoanSimulatorScreen extends HookConsumerWidget {
                         buildButton(
                           text: '×',
                           onPressed: () => onOperationPressed('×'),
-                          backgroundColor: const Color(0xFFB85450),
-                          textColor: Colors.white,
+                          isOperator: true,
                         ),
                       ],
                     ),
@@ -309,10 +398,9 @@ class LoanSimulatorScreen extends HookConsumerWidget {
                         buildButton(text: '5', onPressed: () => onNumberPressed('5')),
                         buildButton(text: '6', onPressed: () => onNumberPressed('6')),
                         buildButton(
-                          text: '-',
+                          text: '－',
                           onPressed: () => onOperationPressed('-'),
-                          backgroundColor: const Color(0xFFB85450),
-                          textColor: Colors.white,
+                          isOperator: true,
                         ),
                       ],
                     ),
@@ -326,16 +414,15 @@ class LoanSimulatorScreen extends HookConsumerWidget {
                         buildButton(text: '2', onPressed: () => onNumberPressed('2')),
                         buildButton(text: '3', onPressed: () => onNumberPressed('3')),
                         buildButton(
-                          text: '+',
+                          text: '＋',
                           onPressed: () => onOperationPressed('+'),
-                          backgroundColor: const Color(0xFFB85450),
-                          textColor: Colors.white,
+                          isOperator: true,
                         ),
                       ],
                     ),
                   ),
                   
-                  // Row 5: 0, ., 次へ, =
+                  // Row 5: 0, ., ローンボタン, =
                   Expanded(
                     child: Row(
                       children: [
@@ -353,16 +440,15 @@ class LoanSimulatorScreen extends HookConsumerWidget {
                           },
                         ),
                         buildButton(
-                          text: '次へ',
-                          onPressed: onLoanNext,
-                          backgroundColor: const Color(0xFFB85450),
-                          textColor: Colors.white,
+                          text: getLoanButtonText(),
+                          icon: getLoanButtonIcon(),
+                          onPressed: onLoanButtonPressed,
+                          isOperator: true,
                         ),
                         buildButton(
-                          text: '=',
+                          text: '＝',
                           onPressed: calculate,
-                          backgroundColor: const Color(0xFFB85450),
-                          textColor: Colors.white,
+                          isOperator: true,
                         ),
                       ],
                     ),
@@ -372,6 +458,7 @@ class LoanSimulatorScreen extends HookConsumerWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
