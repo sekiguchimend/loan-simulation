@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'knowleage_detail_screen.dart';
 import 'widgets/knowleage_tile_widget.dart';
+import 'sample/sample_data.dart';
 
 // Supabaseクライアント
 final supabase = Supabase.instance.client;
@@ -84,37 +85,44 @@ class KnowleageScreen extends HookConsumerWidget {
           // カテゴリー選択チップ
           Container(
             height: 60,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                final isSelected = selectedCategory.value == category;
-                
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(
-                      category,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      selectedCategory.value = category;
+            child: Row(
+              children: [
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      final isSelected = selectedCategory.value == category;
+                      
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          label: Text(
+                            category,
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.black87,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            selectedCategory.value = category;
+                          },
+                          backgroundColor: Colors.grey[100],
+                          selectedColor: Theme.of(context).colorScheme.primary,
+                          checkmarkColor: Colors.white,
+                          side: BorderSide.none,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      );
                     },
-                    backgroundColor: Colors.grey[100],
-                    selectedColor: Theme.of(context).colorScheme.primary,
-                    checkmarkColor: Colors.white,
-                    side: BorderSide.none,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
-                );
-              },
+                ),
+                const SizedBox(width: 16),
+              ],
             ),
           ),
           
@@ -126,33 +134,37 @@ class KnowleageScreen extends HookConsumerWidget {
               loading: () => const Center(
                 child: CircularProgressIndicator(),
               ),
-              error: (error, stackTrace) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'データの読み込みに失敗しました',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () {
-                        ref.invalidate(columnsProvider);
+              error: (error, stackTrace) {
+                // エラー時はサンプルデータを使用
+                final sampleColumns = SampleData.getSampleColumns();
+                final filteredColumns = selectedCategory.value == 'すべて' 
+                    ? sampleColumns
+                    : sampleColumns.where((column) => column['category'] == selectedCategory.value).toList();
+                
+                return ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: filteredColumns.length,
+                  itemBuilder: (context, index) {
+                    final column = filteredColumns[index];
+                    return KnowleageTileWidget(
+                      title: column['title'] ?? '',
+                      imageUrl: column['image'] ?? '',
+                      category: column['category'] ?? '',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => KnowleageDetailScreen(
+                              columnId: column['id'],
+                              title: column['title'] ?? '',
+                              category: column['category'] ?? '',
+                            ),
+                          ),
+                        );
                       },
-                      child: const Text('再試行'),
-                    ),
-                  ],
-                ),
-              ),
+                    );
+                  },
+                );
+              },
               data: (columns) {
                 if (columns.isEmpty) {
                   return Center(
@@ -178,27 +190,25 @@ class KnowleageScreen extends HookConsumerWidget {
                 }
                 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.zero,
                   itemCount: columns.length,
                   itemBuilder: (context, index) {
                     final column = columns[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: KnowleageTileWidget(
-                        title: column['title'] ?? '',
-                        imageUrl: column['image'] ?? '',
-                        category: column['category'] ?? '',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => KnowleageDetailScreen(
-                                columnId: column['id'],
-                                title: column['title'] ?? '',
-                              ),
+                    return KnowleageTileWidget(
+                      title: column['title'] ?? '',
+                      imageUrl: column['image'] ?? '',
+                      category: column['category'] ?? '',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => KnowleageDetailScreen(
+                              columnId: column['id'],
+                              title: column['title'] ?? '',
+                              category: column['category'] ?? '',
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     );
                   },
                 );

@@ -15,150 +15,133 @@ class KnowleageTileWidget extends StatelessWidget {
     required this.onTap,
   });
 
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case '不動産投資':
-        return Colors.red;
-      case '制度・法律':
-        return Colors.blue;
-      case '買い方':
-        return Colors.green;
-      case '税金関連':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
+  Color _getCategoryColor(BuildContext context, String category) {
+    // フィルタリング部分と同じ色を使用
+    return Theme.of(context).colorScheme.primary;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 120,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // 画像部分
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  bottomLeft: Radius.circular(8),
-                ),
-                color: Colors.grey[200],
-              ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  bottomLeft: Radius.circular(8),
-                ),
-                child: imageUrl.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            height: 88, // ブログカードと同じ高さ
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 画像部分（左端にぴったり配置、1:1のアスペクト比）
+                Container(
+                  width: 88, // 高さと同じにして1:1の比率（88x88の正方形）
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                  ),
+                  child: imageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey[400],
+                              size: 28,
+                            ),
+                          ),
+                        )
+                      : Container(
                           color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                          child: Icon(
+                            Icons.article,
+                            color: Colors.grey[400],
+                            size: 28,
+                          ),
+                        ),
+                ),
+                
+                const SizedBox(width: 12),
+                
+                // コンテンツ部分（paddingありで適切な配置）
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // カテゴリータグ（フィルタリング部分と同じ色）
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getCategoryColor(context, category),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          child: Text(
+                            category,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey[200],
-                          child: Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey[400],
-                            size: 32,
+                        
+                        const SizedBox(height: 6),
+                        
+                        // タイトル
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                              height: 1.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      )
-                    : Container(
-                        color: Colors.grey[200],
-                        child: Icon(
-                          Icons.article,
-                          color: Colors.grey[400],
-                          size: 32,
-                        ),
-                      ),
-              ),
-            ),
-            
-            // コンテンツ部分
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // カテゴリータグ
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getCategoryColor(category),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        category,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 8),
-                    
-                    // タイトル
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                          height: 1.4,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    
-                    // 矢印アイコン
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 14,
-                          color: Colors.grey[600],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                
+                // 矢印アイコン（paddingありで中央寄せ）
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 14, 16, 14),
+                  child: Center(
+                    child: Icon(
+                      Icons.chevron_right,
+                      color: Colors.grey[400],
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+        // Divider（左端まで伸ばす）
+        const Divider(
+          height: 1,
+          thickness: 1,
+          color: Colors.grey,
+          indent: 0,
+          endIndent: 0,
+        ),
+      ],
     );
   }
 }
