@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'pages/loansimulator/loansimulator_screen.dart';
-import 'pages/knowleage/knowleage_screen.dart';
+import 'pages/knowleage/knowledge_screen.dart';
 import 'pages/magazine/magazine_screen.dart';
 import 'pages/sns/sns_screen.dart';
 import 'pages/consult/consult_screen.dart';

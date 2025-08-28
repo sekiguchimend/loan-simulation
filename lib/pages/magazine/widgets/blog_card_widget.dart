@@ -1,3 +1,4 @@
+// pages/magazine/widgets/magazine_card_widget.dart
 import 'package:flutter/material.dart';
 import '../magazine_screen.dart'; // BlogMagazineモデルをインポート
 

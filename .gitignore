@@ -41,3 +41,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# 環境変数ファイル
+.env
+.env.local
+.env.production
+.env.staging
+.env.dev
+
+# 設定ファイル（使用する場合）
+config/secrets.dart
+config/keys.dart
+lib/config/api_keys.dart

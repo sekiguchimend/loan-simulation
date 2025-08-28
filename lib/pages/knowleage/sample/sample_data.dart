@@ -1,3 +1,4 @@
+// pages/knowleage/sample/sample_data.dart
 class SampleData {
   static List<Map<String, dynamic>> getSampleColumns() {
     return [

@@ -1,32 +1,11 @@
+// pages/knowleage/knowleage_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'knowleage_detail_screen.dart';
+import '../../providers/knowledge_providers.dart'; // プロバイダーをインポート
+import 'knowledge_detail_screen.dart';
 import 'widgets/knowleage_tile_widget.dart';
 import 'sample/sample_data.dart';
-
-// Supabaseクライアント
-final supabase = Supabase.instance.client;
-
-// カラムデータの状態管理
-final columnsProvider = FutureProvider.family<List<Map<String, dynamic>>, String?>((ref, category) async {
-  try {
-    final query = supabase.from('columns').select('*');
-    
-    if (category != null && category != 'すべて') {
-      final response = await query
-          .eq('category', category)
-          .order('created_at', ascending: false);
-      return List<Map<String, dynamic>>.from(response);
-    } else {
-      final response = await query.order('created_at', ascending: false);
-      return List<Map<String, dynamic>>.from(response);
-    }
-  } catch (e) {
-    throw Exception('データの取得に失敗しました: $e');
-  }
-});
 
 class KnowleageScreen extends HookConsumerWidget {
   const KnowleageScreen({super.key});
@@ -35,8 +14,8 @@ class KnowleageScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCategory = useState<String>('すべて');
     
-    // カテゴリーリスト
-    final categories = ['すべて', '不動産投資', '制度・法律', '買い方', '税金関連'];
+    // 動的にカテゴリーをデータベースから取得
+    final categoriesAsync = ref.watch(categoriesProvider);
     
     // カラムデータの取得
     final columnsAsync = ref.watch(columnsProvider(
@@ -85,44 +64,90 @@ class KnowleageScreen extends HookConsumerWidget {
           // カテゴリー選択チップ
           Container(
             height: 60,
-            child: Row(
-              children: [
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      final isSelected = selectedCategory.value == category;
-                      
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(
-                            category,
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black87,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+            child: categoriesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stackTrace) {
+                // エラー時はデフォルトカテゴリーを表示
+                final defaultCategories = ['すべて', '不動産投資', '制度・法律', '買い方', '税金関連'];
+                return Row(
+                  children: [
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: defaultCategories.length,
+                        itemBuilder: (context, index) {
+                          final category = defaultCategories[index];
+                          final isSelected = selectedCategory.value == category;
+                          
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              label: Text(
+                                category,
+                                style: TextStyle(
+                                  color: isSelected ? Colors.white : Colors.black87,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                selectedCategory.value = category;
+                              },
+                              backgroundColor: Colors.grey[100],
+                              selectedColor: Theme.of(context).colorScheme.primary,
+                              checkmarkColor: Colors.white,
+                              side: BorderSide.none,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                  ],
+                );
+              },
+              data: (categories) => Row(
+                children: [
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categories[index];
+                        final isSelected = selectedCategory.value == category;
+                        
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            label: Text(
+                              category,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black87,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              selectedCategory.value = category;
+                            },
+                            backgroundColor: Colors.grey[100],
+                            selectedColor: Theme.of(context).colorScheme.primary,
+                            checkmarkColor: Colors.white,
+                            side: BorderSide.none,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           ),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            selectedCategory.value = category;
-                          },
-                          backgroundColor: Colors.grey[100],
-                          selectedColor: Theme.of(context).colorScheme.primary,
-                          checkmarkColor: Colors.white,
-                          side: BorderSide.none,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-              ],
+                  const SizedBox(width: 16),
+                ],
+              ),
             ),
           ),
           
@@ -136,6 +161,7 @@ class KnowleageScreen extends HookConsumerWidget {
               ),
               error: (error, stackTrace) {
                 // エラー時はサンプルデータを使用
+                print('データベース接続エラー、サンプルデータを表示: $error');
                 final sampleColumns = SampleData.getSampleColumns();
                 final filteredColumns = selectedCategory.value == 'すべて' 
                     ? sampleColumns
@@ -196,7 +222,7 @@ class KnowleageScreen extends HookConsumerWidget {
                     final column = columns[index];
                     return KnowleageTileWidget(
                       title: column['title'] ?? '',
-                      imageUrl: column['image'] ?? '',
+                      imageUrl: column['image_url'] ?? '', // 新しいフィールド名
                       category: column['category'] ?? '',
                       onTap: () {
                         Navigator.of(context).push(

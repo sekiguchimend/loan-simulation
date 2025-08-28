@@ -1,3 +1,4 @@
+// pages/magazine/magazine_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'magazine_screen.dart'; // BlogMagazineモデルをインポート
