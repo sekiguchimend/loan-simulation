@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/knowledge_providers.dart';
+import 'models/knowledge_models.dart';
 
 class KnowleageDetailScreen extends HookConsumerWidget {
   final int columnId;
@@ -49,12 +50,12 @@ class KnowleageDetailScreen extends HookConsumerWidget {
           print('記事詳細取得エラー: $error');
           return _buildErrorScreen(context, ref);
         },
-        data: (columnDetail) {
-          if (columnDetail == null) {
+        data: (article) {
+          if (article == null) {
             return _buildNotFoundScreen(context);
           }
           
-          return _buildDetailContent(context, columnDetail);
+          return _buildDetailContent(context, article);
         },
       ),
     );
@@ -194,7 +195,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildDetailContent(BuildContext context, Map<String, dynamic> detail) {
+  Widget _buildDetailContent(BuildContext context, KnowledgeArticle article) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,8 +206,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // カテゴリーチップ
-                if ((detail['category'] != null && detail['category'].isNotEmpty) || 
-                    (category != null && category!.isNotEmpty))
+                if (article.category.isNotEmpty || (category != null && category!.isNotEmpty))
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 6,
@@ -217,7 +217,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(
-                      detail['category'] ?? category ?? '',
+                      article.category.isNotEmpty ? article.category : category ?? '',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10,
@@ -230,7 +230,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                 
                 // タイトル
                 Text(
-                  detail['title'] ?? title,
+                  article.title,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -243,13 +243,13 @@ class KnowleageDetailScreen extends HookConsumerWidget {
           ),
 
           // メイン画像
-          if (detail['image'] != null && detail['image'].isNotEmpty)
+          if (article.imageUrl != null && article.imageUrl!.isNotEmpty)
             Container(
               width: double.infinity,
               height: 200,
               color: Colors.grey[200],
               child: CachedNetworkImage(
-                imageUrl: detail['image'],
+                imageUrl: article.imageUrl!,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
                   color: Colors.grey[200],
@@ -274,7 +274,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 目次（TOC）
-                if (detail['toc'] != null && detail['toc'].isNotEmpty)
+                if (article.toc != null && article.toc!.isNotEmpty)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -296,7 +296,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          detail['toc'],
+                          article.toc!,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.blue[600],
@@ -307,13 +307,13 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                     ),
                   ),
 
-                if (detail['toc'] != null && detail['toc'].isNotEmpty)
+                if (article.toc != null && article.toc!.isNotEmpty)
                   const SizedBox(height: 20),
 
                 // コンテンツ
-                if (detail['content'] != null && detail['content'].isNotEmpty)
+                if (article.content != null && article.content!.isNotEmpty)
                   Text(
-                    detail['content'],
+                    article.content!,
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.black87,
@@ -321,11 +321,11 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                     ),
                   ),
 
-                if (detail['content'] != null && detail['content'].isNotEmpty)
+                if (article.content != null && article.content!.isNotEmpty)
                   const SizedBox(height: 20),
 
                 // ボックス画像
-                if (detail['box'] != null && detail['box'].isNotEmpty)
+                if (article.boxImageUrl != null && article.boxImageUrl!.isNotEmpty)
                   Container(
                     width: double.infinity,
                     constraints: const BoxConstraints(
@@ -338,7 +338,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: CachedNetworkImage(
-                        imageUrl: detail['box'],
+                        imageUrl: article.boxImageUrl!,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           height: 200,

@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import '../../providers/knowledge_providers.dart';
 import 'knowledge_detail_screen.dart';
 import 'widgets/knowleage_tile_widget.dart';
+import 'models/knowledge_models.dart';
 
 class KnowleageScreen extends HookConsumerWidget {
   const KnowleageScreen({super.key});
@@ -181,16 +182,16 @@ class KnowleageScreen extends HookConsumerWidget {
                     itemBuilder: (context, index) {
                       final column = columns[index];
                       return KnowleageTileWidget(
-                        title: column['title'] ?? '',
-                        imageUrl: column['image_url'] ?? '',
-                        category: column['category'] ?? '',
+                        title: column.title,
+                        imageUrl: column.imageUrl ?? '',
+                        category: column.category,
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => KnowleageDetailScreen(
-                                columnId: column['id'],
-                                title: column['title'] ?? '',
-                                category: column['category'] ?? '',
+                                columnId: column.id,
+                                title: column.title,
+                                category: column.category,
                               ),
                             ),
                           );

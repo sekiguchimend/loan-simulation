@@ -1,17 +1,16 @@
-// lib/providers/knowledge_providers.dart
+// providers/knowledge_providers.dart
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../pages/knowleage/models/knowledge_models.dart';
 
-// Supabaseクライアント
 final supabase = Supabase.instance.client;
 
 // 記事一覧データの状態管理
-final columnsProvider = FutureProvider.family<List<Map<String, dynamic>>, String?>((ref, category) async {
+final columnsProvider = FutureProvider.family<List<ArticleColumn>, String?>((ref, category) async {
   try {
-    // クエリの基本形を作成
-    final query = supabase
+    var query = supabase
         .from('columns')
-        .select('id, title, image_url, category, created_at');
+        .select('id, title, image_url, category, created_at, updated_at, is_published, sort_order');
     
     // 公開済みのものだけを取得し、カテゴリーでフィルタリング
     if (category != null && category != 'すべて') {
@@ -20,13 +19,13 @@ final columnsProvider = FutureProvider.family<List<Map<String, dynamic>>, String
           .eq('category', category)
           .order('sort_order', ascending: true)
           .order('created_at', ascending: false);
-      return List<Map<String, dynamic>>.from(response);
+      return (response as List).map((item) => ArticleColumn.fromJson(item)).toList();
     } else {
       final response = await query
           .eq('is_published', true)
           .order('sort_order', ascending: true)
           .order('created_at', ascending: false);
-      return List<Map<String, dynamic>>.from(response);
+      return (response as List).map((item) => ArticleColumn.fromJson(item)).toList();
     }
   } catch (e) {
     print('データベース接続エラー: $e');
@@ -35,7 +34,7 @@ final columnsProvider = FutureProvider.family<List<Map<String, dynamic>>, String
 });
 
 // 記事詳細データの状態管理
-final columnDetailProvider = FutureProvider.family<Map<String, dynamic>?, int>((ref, columnId) async {
+final columnDetailProvider = FutureProvider.family<KnowledgeArticle?, int>((ref, columnId) async {
   try {
     // JOINを使って関連データを一度に取得
     final response = await supabase
@@ -43,28 +42,34 @@ final columnDetailProvider = FutureProvider.family<Map<String, dynamic>?, int>((
         .select('''
           *,
           columns:column_id (
+            id,
             title,
             image_url,
             category,
-            created_at
+            created_at,
+            updated_at,
+            is_published,
+            sort_order
           )
         ''')
         .eq('column_id', columnId)
         .single();
     
-    // レスポンス構造をフラット化
+    // レスポンス構造を新しいモデルに変換
     final columnData = response['columns'] as Map<String, dynamic>;
-    return {
-      'id': response['id'],
-      'column_id': response['column_id'],
-      'title': columnData['title'],
-      'image': columnData['image_url'],
-      'category': columnData['category'],
-      'created_at': columnData['created_at'],
-      'toc': response['toc'],
-      'content': response['content'],
-      'box': response['box_image_url'],
-    };
+    final column = ArticleColumn.fromJson(columnData);
+    
+    final detail = ColumnDetail(
+      id: response['id'],
+      columnId: response['column_id'],
+      toc: response['toc'],
+      content: response['content'],
+      boxImageUrl: response['box_image_url'],
+      createdAt: DateTime.parse(response['created_at']),
+      updatedAt: DateTime.parse(response['updated_at']),
+    );
+
+    return KnowledgeArticle(column: column, detail: detail);
   } catch (e) {
     print('詳細データベース接続エラー: $e');
     throw Exception('詳細データの取得に失敗しました: $e');
