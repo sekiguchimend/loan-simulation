@@ -28,36 +28,83 @@ class HomePage extends HookConsumerWidget {
 
     return Scaffold(
       body: pages[selectedIndex.value],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: selectedIndex.value,
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: selectedIndex.value,
         onTap: (index) {
           selectedIndex.value = index;
         },
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calculate),
-            label: '電卓',
+      ),
+    );
+  }
+}
+
+class CustomBottomNavigationBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTap;
+
+  const CustomBottomNavigationBar({
+    Key? key,
+    required this.selectedIndex,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      {'icon': Icons.calculate, 'label': '電卓'},
+      {'icon': Icons.menu_book, 'label': '不動産の知識'},
+      {'icon': Icons.library_books, 'label': '大吉マガジン'},
+      {'icon': Icons.person, 'label': 'SNS'},
+      {'icon': Icons.chat, 'label': 'ご相談'},
+    ];
+
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey.shade300,
+            width: 0.5,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: '不動産の知識',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.library_books),
-            label: '大吉マガジン',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'SNS',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'ご相談',
-          ),
-        ],
+        ),
+      ),
+      child: Row(
+        children: List.generate(items.length, (index) {
+          final isSelected = index == selectedIndex;
+          final item = items[index];
+          
+          return Expanded(
+            child: InkWell(
+              onTap: () => onTap(index),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    item['icon'] as IconData,
+                    color: isSelected 
+                        ? Theme.of(context).colorScheme.primary 
+                        : Colors.grey,
+                    size: 24,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    item['label'] as String,
+                    style: TextStyle(
+                      fontSize: 9, // 少し小さめに
+                      color: isSelected 
+                          ? Theme.of(context).colorScheme.primary 
+                          : Colors.grey,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2, // 最大2行まで許可
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
       ),
     );
   }

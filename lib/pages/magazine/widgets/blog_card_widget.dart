@@ -83,7 +83,7 @@ class BlogCardWidget extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[600],
+                            color: Colors.black87,
                           ),
                         ),
                         

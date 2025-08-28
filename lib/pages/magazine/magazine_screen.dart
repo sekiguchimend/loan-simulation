@@ -157,7 +157,7 @@ class MagazineScreen extends HookConsumerWidget {
     final magazine = ref.watch(magazineProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('大吉マガジン'),
         centerTitle: true,
@@ -178,6 +178,27 @@ class MagazineScreen extends HookConsumerWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
+              // 説明部分
+              Container(
+                width: double.infinity,
+                height: 32,
+                color: Colors.grey[200],
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '社長の大吉日記、大吉最新NEWSなど',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w900
+                      ),
+                    ),
+                  ),
+                  ),
+              ),
+
               // ブログリスト（パディングなし）
               blogList.when(
                 data: (blogs) => blogs.isEmpty 

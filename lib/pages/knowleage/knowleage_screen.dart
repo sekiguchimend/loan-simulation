@@ -60,6 +60,27 @@ class KnowleageScreen extends HookConsumerWidget {
       ),
       body: Column(
         children: [
+          // 説明部分
+          Container(
+            width: double.infinity,
+            height: 32,
+            color: Colors.grey[200],
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '不動産と資産運用のお役立ち情報',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w900
+                  ),
+                ),
+              ),
+            ),
+          ),
+          
           // カテゴリー選択チップ
           Container(
             height: 60,
