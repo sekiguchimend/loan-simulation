@@ -1,6 +1,7 @@
-// pages/magazine/widgets/magazine_card_widget.dart
+// pages/magazine/widgets/blog_card_widget.dart
 import 'package:flutter/material.dart';
-import '../magazine_screen.dart'; // BlogMagazineモデルをインポート
+import 'package:cached_network_image/cached_network_image.dart';
+import '../models/blog_magazine.dart';
 
 class BlogCardWidget extends StatelessWidget {
   final BlogMagazine blog;
@@ -30,16 +31,20 @@ class BlogCardWidget extends StatelessWidget {
                     color: Colors.grey[200],
                   ),
                   child: blog.thumbnail != null && blog.thumbnail!.isNotEmpty
-                      ? Image.network(
-                          blog.thumbnail!,
+                      ? CachedNetworkImage(
+                          imageUrl: blog.thumbnail!,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.image,
-                              color: Colors.grey[400],
-                              size: 28,
-                            );
-                          },
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, error, stackTrace) => Icon(
+                            Icons.image,
+                            color: Colors.grey[400],
+                            size: 28,
+                          ),
                         )
                       : Icon(
                           Icons.article,
@@ -226,8 +231,15 @@ class NoBlogCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 16),
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
       child: Column(
         children: [
           Icon(
@@ -237,11 +249,22 @@ class NoBlogCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'まだブログがありません',
+            'ブログ記事がありません',
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
             ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'まだブログ記事が投稿されていません。\n今後の投稿をお楽しみに。',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

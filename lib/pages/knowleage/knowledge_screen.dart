@@ -2,10 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import '../../providers/knowledge_providers.dart'; // プロバイダーをインポート
+import '../../providers/knowledge_providers.dart';
 import 'knowledge_detail_screen.dart';
 import 'widgets/knowleage_tile_widget.dart';
-import 'sample/sample_data.dart';
 
 class KnowleageScreen extends HookConsumerWidget {
   const KnowleageScreen({super.key});
@@ -38,46 +37,94 @@ class KnowleageScreen extends HookConsumerWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
-      body: Column(
-        children: [
-          // 説明部分
-          Container(
-            width: double.infinity,
-            height: 32,
-            color: Colors.grey[200],
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '不動産と資産運用のお役立ち情報',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w900
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(categoriesProvider);
+          ref.invalidate(columnsProvider(
+            selectedCategory.value == 'すべて' ? null : selectedCategory.value
+          ));
+        },
+        child: Column(
+          children: [
+            // 説明部分
+            Container(
+              width: double.infinity,
+              height: 32,
+              color: Colors.grey[200],
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '不動産と資産運用のお役立ち情報',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w900
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          
-          // カテゴリー選択チップ
-          Container(
-            height: 60,
-            child: categoriesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) {
-                // エラー時はデフォルトカテゴリーを表示
-                final defaultCategories = ['すべて', '不動産投資', '制度・法律', '買い方', '税金関連'];
-                return Row(
+            
+            // カテゴリー選択チップ
+            Container(
+              height: 60,
+              child: categoriesAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stackTrace) {
+                  print('カテゴリー取得エラー: $error');
+                  // エラー時はデフォルトカテゴリーを表示
+                  final defaultCategories = ['すべて', '不動産投資', '制度・法律', '買い方', '税金関連'];
+                  return Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: defaultCategories.length,
+                          itemBuilder: (context, index) {
+                            final category = defaultCategories[index];
+                            final isSelected = selectedCategory.value == category;
+                            
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: FilterChip(
+                                label: Text(
+                                  category,
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.white : Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  selectedCategory.value = category;
+                                },
+                                backgroundColor: Colors.grey[100],
+                                selectedColor: Theme.of(context).colorScheme.primary,
+                                checkmarkColor: Colors.white,
+                                side: BorderSide.none,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                  );
+                },
+                data: (categories) => Row(
                   children: [
                     const SizedBox(width: 16),
                     Expanded(
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: defaultCategories.length,
+                        itemCount: categories.length,
                         itemBuilder: (context, index) {
-                          final category = defaultCategories[index];
+                          final category = categories[index];
                           final isSelected = selectedCategory.value == category;
                           
                           return Padding(
@@ -107,141 +154,162 @@ class KnowleageScreen extends HookConsumerWidget {
                     ),
                     const SizedBox(width: 16),
                   ],
-                );
-              },
-              data: (categories) => Row(
-                children: [
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        final category = categories[index];
-                        final isSelected = selectedCategory.value == category;
-                        
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: FilterChip(
-                            label: Text(
-                              category,
-                              style: TextStyle(
-                                color: isSelected ? Colors.white : Colors.black87,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            
+            const Divider(height: 1, color: Colors.grey),
+            
+            // コンテンツ表示
+            Expanded(
+              child: columnsAsync.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (error, stackTrace) {
+                  print('記事データ取得エラー: $error');
+                  return _buildErrorCard('記事の読み込みに失敗しました', error.toString(), ref, selectedCategory.value);
+                },
+                data: (columns) {
+                  if (columns.isEmpty) {
+                    return _buildNoDataCard();
+                  }
+                  
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: columns.length,
+                    itemBuilder: (context, index) {
+                      final column = columns[index];
+                      return KnowleageTileWidget(
+                        title: column['title'] ?? '',
+                        imageUrl: column['image_url'] ?? '',
+                        category: column['category'] ?? '',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => KnowleageDetailScreen(
+                                columnId: column['id'],
+                                title: column['title'] ?? '',
+                                category: column['category'] ?? '',
                               ),
                             ),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              selectedCategory.value = category;
-                            },
-                            backgroundColor: Colors.grey[100],
-                            selectedColor: Theme.of(context).colorScheme.primary,
-                            checkmarkColor: Colors.white,
-                            side: BorderSide.none,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                ],
-              ),
-            ),
-          ),
-          
-          const Divider(height: 1, color: Colors.grey),
-          
-          // コンテンツ表示
-          Expanded(
-            child: columnsAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              error: (error, stackTrace) {
-                // エラー時はサンプルデータを使用
-                print('データベース接続エラー、サンプルデータを表示: $error');
-                final sampleColumns = SampleData.getSampleColumns();
-                final filteredColumns = selectedCategory.value == 'すべて' 
-                    ? sampleColumns
-                    : sampleColumns.where((column) => column['category'] == selectedCategory.value).toList();
-                
-                return ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: filteredColumns.length,
-                  itemBuilder: (context, index) {
-                    final column = filteredColumns[index];
-                    return KnowleageTileWidget(
-                      title: column['title'] ?? '',
-                      imageUrl: column['image'] ?? '',
-                      category: column['category'] ?? '',
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => KnowleageDetailScreen(
-                              columnId: column['id'],
-                              title: column['title'] ?? '',
-                              category: column['category'] ?? '',
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-              data: (columns) {
-                if (columns.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.article_outlined,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'まだ記事がありません',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
+                          );
+                        },
+                      );
+                    },
                   );
-                }
-                
-                return ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: columns.length,
-                  itemBuilder: (context, index) {
-                    final column = columns[index];
-                    return KnowleageTileWidget(
-                      title: column['title'] ?? '',
-                      imageUrl: column['image_url'] ?? '', // 新しいフィールド名
-                      category: column['category'] ?? '',
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => KnowleageDetailScreen(
-                              columnId: column['id'],
-                              title: column['title'] ?? '',
-                              category: column['category'] ?? '',
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+                },
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoDataCard() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.article_outlined,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '記事がありません',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'まだ不動産の知識記事が投稿されていません。\n今後の投稿をお楽しみに。',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                height: 1.6,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorCard(String message, String errorDetails, WidgetRef ref, String selectedCategory) {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(32),
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.red[50],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.red[200]!),
           ),
-        ],
+          child: Column(
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red[400],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red[700],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'データベースへの接続に問題が発生している可能性があります。',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.red[600],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(categoriesProvider);
+                  ref.invalidate(columnsProvider(
+                    selectedCategory == 'すべて' ? null : selectedCategory
+                  ));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[600],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                child: const Text(
+                  '再試行',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 // pages/magazine/widgets/magazine_card_widget.dart
 import 'package:flutter/material.dart';
-import '../magazine_screen.dart'; // BlogMagazineモデルをインポート
+import 'package:cached_network_image/cached_network_image.dart';
+import '../models/blog_magazine.dart';
 
 class MagazineCardWidget extends StatelessWidget {
   final BlogMagazine magazine;
@@ -27,12 +28,20 @@ class MagazineCardWidget extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: magazine.thumbnail != null && magazine.thumbnail!.isNotEmpty
-              ? Image.network(
-                  magazine.thumbnail!,
+              ? CachedNetworkImage(
+                  imageUrl: magazine.thumbnail!,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: cardHeight,
-                  errorBuilder: (context, error, stackTrace) {
+                  placeholder: (context, url) => Container(
+                    width: double.infinity,
+                    height: cardHeight,
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                  errorWidget: (context, error, stackTrace) {
                     return MagazinePlaceholder(height: cardHeight);
                   },
                 )
@@ -114,26 +123,38 @@ class NoMagazineCard extends StatelessWidget {
         return Container(
           width: double.infinity,
           height: cardHeight,
-          color: Colors.grey[200],
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.library_books_outlined,
-                  size: 64,
-                  color: Colors.grey[400],
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.library_books_outlined,
+                size: 64,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'マガジンがありません',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'マガジンはまだ準備中です',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'まだマガジンが準備されていません',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
-              ],
-            ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         );
       },

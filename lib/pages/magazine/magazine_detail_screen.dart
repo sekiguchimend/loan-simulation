@@ -1,7 +1,8 @@
 // pages/magazine/magazine_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'magazine_screen.dart'; // BlogMagazineモデルをインポート
+import 'package:cached_network_image/cached_network_image.dart';
+import 'models/blog_magazine.dart';
 
 class MagazineDetailScreen extends HookConsumerWidget {
   final BlogMagazine blog;
@@ -71,22 +72,17 @@ class MagazineDetailScreen extends HookConsumerWidget {
         color: Colors.grey[200],
       ),
       child: blog.thumbnail != null && blog.thumbnail!.isNotEmpty
-          ? Image.network(
-              blog.thumbnail!,
+          ? CachedNetworkImage(
+              imageUrl: blog.thumbnail!,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
+              placeholder: (context, url) => Container(
+                color: Colors.grey[200],
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              errorWidget: (context, error, stackTrace) {
                 return _buildPlaceholderImage();
-              },
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
               },
             )
           : _buildPlaceholderImage(),
