@@ -1,4 +1,4 @@
-// pages/knowleage/knowleage_screen.dart
+// loan-simulation/lib/pages/knowleage/knowledge_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -230,16 +230,6 @@ class KnowleageScreen extends HookConsumerWidget {
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[700],
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'まだ不動産の知識記事が投稿されていません。\n今後の投稿をお楽しみに。',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-                height: 1.6,
-              ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),

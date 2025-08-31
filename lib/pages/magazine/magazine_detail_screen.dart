@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'models/blog_magazine.dart';
+import '../../providers/magazine_providers.dart';
+import 'widgets/magazine_card_widget.dart';
 
 class MagazineDetailScreen extends HookConsumerWidget {
   final BlogMagazine blog;
@@ -14,6 +17,8 @@ class MagazineDetailScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final magazine = ref.watch(magazineProvider);
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -34,30 +39,90 @@ class MagazineDetailScreen extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ヘッダー画像
-            _buildHeaderImage(),
-            
-            // コンテンツ
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 日付とラベル
-                  _buildDateAndLabel(),
+                  // 日付（左上、黒文字）
+                  Text(
+                    _formatDate(blog.createdAt),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   
-                  // タイトル
-                  _buildTitle(),
+                  // Staff Blogラベル（背景黒）
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black87,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'Staff Blog',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   
-                  // コンテンツ
-                  _buildContent(),
+                  // タイトル（小さめ）
+                  Text(
+                    blog.title ?? 'タイトルなし',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      height: 1.3,
+                    ),
+                  ),
+                  
+                  // const SizedBox(height: 12),
                 ],
               ),
             ),
+            
+            // 画像
+            _buildHeaderImage(),
+            
+            const SizedBox(height: 20),
+            
+            // 本文
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _buildContent(),
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // マガジンセクション
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: magazine.when(
+                data: (mag) => mag != null 
+                    ? MagazineCardWidget(
+                        magazine: mag,
+                        onTap: () => _launchMagazine(mag.url),
+                      )
+                    : const NoMagazineCard(),
+                loading: () => const MagazineCardSkeleton(),
+                error: (error, stack) => _buildMagazineErrorCard('マガジンの読み込みに失敗しました', error.toString(), ref),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -115,55 +180,6 @@ class MagazineDetailScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildDateAndLabel() {
-    return Row(
-      children: [
-        // 日付
-        Text(
-          _formatDate(blog.createdAt),
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
-        
-        const SizedBox(width: 12),
-        
-        // Staff Blogラベル
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 4,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.blue[600],
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: const Text(
-            'Staff Blog',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTitle() {
-    return Text(
-      blog.title ?? 'タイトルなし',
-      style: const TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-        height: 1.3,
-      ),
-    );
-  }
-
   Widget _buildContent() {
     if (blog.content == null || blog.content!.isEmpty) {
       return Container(
@@ -193,62 +209,54 @@ class MagazineDetailScreen extends HookConsumerWidget {
       );
     }
 
+    // シンプルなテキスト表示（白いボックスなし）
+    return Text(
+      blog.content!,
+      style: const TextStyle(
+        fontSize: 16,
+        color: Colors.black87,
+        height: 1.6,
+      ),
+    );
+  }
+
+  Widget _buildMagazineErrorCard(String message, String errorDetails, WidgetRef ref) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      height: 200,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.red[50],
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: Colors.red[200]!),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // コンテンツヘッダー
-          Row(
-            children: [
-              Icon(
-                Icons.article,
-                color: Colors.blue[600],
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '記事内容',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
-                ),
-              ),
-            ],
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: Colors.red[400],
           ),
-          
           const SizedBox(height: 16),
-          
-          // 区切り線
-          Container(
-            width: double.infinity,
-            height: 1,
-            color: Colors.grey[200],
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // 実際のコンテンツ
           Text(
-            blog.content!,
-            style: const TextStyle(
+            message,
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.black87,
-              height: 1.6,
+              color: Colors.red[700],
+              fontWeight: FontWeight.w600,
             ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              ref.invalidate(magazineProvider);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[600],
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('再試行'),
           ),
         ],
       ),
@@ -257,5 +265,20 @@ class MagazineDetailScreen extends HookConsumerWidget {
 
   String _formatDate(DateTime date) {
     return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
+  }
+
+  void _launchMagazine(String? url) async {
+    if (url == null || url.isEmpty) {
+      return;
+    }
+    
+    final uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      print('URL起動エラー: $e');
+    }
   }
 }

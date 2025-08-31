@@ -1,4 +1,6 @@
-// providers/knowledge_providers.dart
+// loan-simulation/lib/providers/knowledge_providers.dart
+// 修正版 - カテゴリーを新しいcategoriesテーブルから取得
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../pages/knowleage/models/knowledge_models.dart';
@@ -76,27 +78,161 @@ final columnDetailProvider = FutureProvider.family<KnowledgeArticle?, int>((ref,
   }
 });
 
-// カテゴリー一覧を動的に取得
+// カテゴリー一覧を新しいcategoriesテーブルから取得（修正）
 final categoriesProvider = FutureProvider<List<String>>((ref) async {
   try {
+    // アクティブなカテゴリーのみを取得
     final response = await supabase
-        .from('columns')
-        .select('category')
-        .eq('is_published', true);
+        .from('categories')
+        .select('name')
+        .eq('is_active', true)
+        .order('display_order', ascending: true)
+        .order('name', ascending: true);
     
-    // 重複を除去してソート
+    // カテゴリー名のリストを作成
     final categories = response
-        .map<String>((row) => row['category'] as String)
-        .toSet()
+        .map<String>((row) => row['name'] as String)
         .toList();
     
-    categories.sort();
     categories.insert(0, 'すべて');  // 先頭に「すべて」を追加
     
     return categories;
   } catch (e) {
     print('カテゴリー取得エラー: $e');
-    // エラー時はデフォルトカテゴリーを返す
-    return ['すべて', '不動産投資', '制度・法律', '買い方', '税金関連'];
+    // エラー時はcolumnsテーブルからフォールバック取得を試行
+    try {
+      print('フォールバック: columnsテーブルからカテゴリーを取得中...');
+      final fallbackResponse = await supabase
+          .from('columns')
+          .select('category')
+          .eq('is_published', true);
+      
+      final fallbackCategories = fallbackResponse
+          .map<String>((row) => row['category'] as String)
+          .toSet()
+          .toList();
+      
+      fallbackCategories.sort();
+      fallbackCategories.insert(0, 'すべて');
+      
+      return fallbackCategories;
+    } catch (fallbackError) {
+      print('フォールバック取得もエラー: $fallbackError');
+      // 最終的なフォールバック：デフォルトカテゴリーを返す
+      return ['すべて', '不動産投資', '制度・法律', '買い方', '税金関連'];
+    }
   }
 });
+
+/// カテゴリーの詳細情報を取得（表示順などが必要な場合）
+final categoryDetailsProvider = FutureProvider<List<CategoryDetail>>((ref) async {
+  try {
+    final response = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', ascending: true)
+        .order('name', ascending: true);
+    
+    return response.map<CategoryDetail>((item) => CategoryDetail.fromJson(item)).toList();
+  } catch (e) {
+    print('カテゴリー詳細取得エラー: $e');
+    throw Exception('カテゴリー詳細の取得に失敗しました: $e');
+  }
+});
+
+/// カテゴリーの詳細情報モデル（ユーザーアプリ用）
+class CategoryDetail {
+  final int id;
+  final String name;
+  final int displayOrder;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  CategoryDetail({
+    required this.id,
+    required this.name,
+    this.displayOrder = 0,
+    this.isActive = true,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory CategoryDetail.fromJson(Map<String, dynamic> json) {
+    return CategoryDetail(
+      id: json['id'],
+      name: json['name'],
+      displayOrder: json['display_order'] ?? 0,
+      isActive: json['is_active'] ?? true,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'display_order': displayOrder,
+      'is_active': isActive,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+}
+
+/// カテゴリーと記事数の組み合わせ（統計表示用）
+final categoryStatsProvider = FutureProvider<List<CategoryStats>>((ref) async {
+  try {
+    // カテゴリー一覧を取得
+    final categoriesResponse = await supabase
+        .from('categories')
+        .select('id, name, display_order')
+        .eq('is_active', true)
+        .order('display_order', ascending: true);
+    
+    // 各カテゴリーの記事数を取得
+    final List<CategoryStats> stats = [];
+    
+    for (final categoryData in categoriesResponse) {
+      final articlesCountResponse = await supabase
+          .from('columns')
+          .select('id')
+          .eq('category', categoryData['name'])
+          .eq('is_published', true);
+      
+      stats.add(CategoryStats(
+        id: categoryData['id'],
+        name: categoryData['name'],
+        displayOrder: categoryData['display_order'] ?? 0,
+        articlesCount: articlesCountResponse.length,
+      ));
+    }
+    
+    return stats;
+  } catch (e) {
+    print('カテゴリー統計取得エラー: $e');
+    throw Exception('カテゴリー統計の取得に失敗しました: $e');
+  }
+});
+
+/// カテゴリー統計モデル
+class CategoryStats {
+  final int id;
+  final String name;
+  final int displayOrder;
+  final int articlesCount;
+
+  CategoryStats({
+    required this.id,
+    required this.name,
+    this.displayOrder = 0,
+    required this.articlesCount,
+  });
+
+  @override
+  String toString() {
+    return 'CategoryStats{id: $id, name: $name, displayOrder: $displayOrder, articlesCount: $articlesCount}';
+  }
+}

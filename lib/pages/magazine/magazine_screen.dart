@@ -30,15 +30,6 @@ class MagazineScreen extends HookConsumerWidget {
           fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
-        actions: [
-          // デバッグ情報表示（開発時のみ）
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              _showDebugInfo(context, ref);
-            },
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -209,59 +200,6 @@ class MagazineScreen extends HookConsumerWidget {
               foregroundColor: Colors.white,
             ),
             child: const Text('再試行'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDebugInfo(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('デバッグ情報'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('データソース状況:'),
-            const SizedBox(height: 8),
-            ref.watch(databaseConnectionProvider).when(
-              data: (isConnected) => Text(
-                isConnected ? '✅ データベース接続成功' : '❌ データベース接続失敗',
-              ),
-              loading: () => const Text('🔄 接続確認中...'),
-              error: (error, stack) => Text('❌ 接続エラー: $error'),
-            ),
-            const SizedBox(height: 16),
-            const Text('プロバイダー状況:'),
-            const SizedBox(height: 8),
-            ref.watch(blogListProvider).when(
-              data: (blogs) => Text('ブログ: ${blogs.length}件'),
-              loading: () => const Text('ブログ: 読み込み中...'),
-              error: (error, stack) => const Text('ブログ: エラー'),
-            ),
-            const SizedBox(height: 4),
-            ref.watch(magazineProvider).when(
-              data: (magazine) => Text('マガジン: ${magazine != null ? "1件" : "0件"}'),
-              loading: () => const Text('マガジン: 読み込み中...'),
-              error: (error, stack) => const Text('マガジン: エラー'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('閉じる'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ref.invalidate(blogListProvider);
-              ref.invalidate(magazineProvider);
-              ref.invalidate(databaseConnectionProvider);
-            },
-            child: const Text('リフレッシュ'),
           ),
         ],
       ),
