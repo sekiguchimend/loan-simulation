@@ -14,8 +14,7 @@ final blogListProvider = FutureProvider<List<BlogMagazine>>((ref) async {
         .from('blogs')
         .select('*')
         .eq('status', false) // ブログのみ取得
-        .order('created_at', ascending: false)
-        .limit(3);
+        .order('created_at', ascending: false);
 
     print('ブログデータ取得成功: ${response.length}件');
 

@@ -1,4 +1,6 @@
 // loan-simulation/lib/pages/knowleage/knowledge_screen.dart
+// 緊急修正版 - nullセーフ対応
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -77,85 +79,12 @@ class KnowleageScreen extends HookConsumerWidget {
                   print('カテゴリー取得エラー: $error');
                   // エラー時はデフォルトカテゴリーを表示
                   final defaultCategories = ['すべて', '不動産投資', '制度・法律', '買い方', '税金関連'];
-                  return Row(
-                    children: [
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: defaultCategories.length,
-                          itemBuilder: (context, index) {
-                            final category = defaultCategories[index];
-                            final isSelected = selectedCategory.value == category;
-                            
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: FilterChip(
-                                label: Text(
-                                  category,
-                                  style: TextStyle(
-                                    color: isSelected ? Colors.white : Colors.black87,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  selectedCategory.value = category;
-                                },
-                                backgroundColor: Colors.grey[100],
-                                selectedColor: Theme.of(context).colorScheme.primary,
-                                checkmarkColor: Colors.white,
-                                side: BorderSide.none,
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                    ],
-                  );
+                  return _buildCategoryChips(context, defaultCategories, selectedCategory);
                 },
-                data: (categories) => Row(
-                  children: [
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          final category = categories[index];
-                          final isSelected = selectedCategory.value == category;
-                          
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(
-                                category,
-                                style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              selected: isSelected,
-                              onSelected: (selected) {
-                                selectedCategory.value = category;
-                              },
-                              backgroundColor: Colors.grey[100],
-                              selectedColor: Theme.of(context).colorScheme.primary,
-                              checkmarkColor: Colors.white,
-                              side: BorderSide.none,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                ),
+                data: (categories) {
+                  print('カテゴリー一覧取得成功: $categories'); // デバッグ情報
+                  return _buildCategoryChips(context, categories, selectedCategory);
+                },
               ),
             ),
             
@@ -172,6 +101,12 @@ class KnowleageScreen extends HookConsumerWidget {
                   return _buildErrorCard('記事の読み込みに失敗しました', error.toString(), ref, selectedCategory.value);
                 },
                 data: (columns) {
+                  print('記事一覧取得成功: ${columns.length}件'); // デバッグ情報
+                  if (columns.isNotEmpty) {
+                    // nullセーフなデバッグ情報
+                    print('最初の記事のカテゴリー情報: categoryId=${columns[0].categoryId ?? "null"}, categoryName=${columns[0].categoryName ?? "null"}');
+                  }
+                  
                   if (columns.isEmpty) {
                     return _buildNoDataCard();
                   }
@@ -184,7 +119,7 @@ class KnowleageScreen extends HookConsumerWidget {
                       return KnowleageTileWidget(
                         title: column.title,
                         imageUrl: column.imageUrl ?? '',
-                        category: column.category,
+                        category: column.category, // 後方互換性プロパティを使用
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -205,6 +140,53 @@ class KnowleageScreen extends HookConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCategoryChips(
+    BuildContext context, 
+    List<String> categories, 
+    ValueNotifier<String> selectedCategory
+  ) {
+    return Row(
+      children: [
+        const SizedBox(width: 16),
+        Expanded(
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final category = categories[index];
+              final isSelected = selectedCategory.value == category;
+              
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(
+                    category,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black87,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    print('カテゴリー選択: $category'); // デバッグ情報
+                    selectedCategory.value = category;
+                  },
+                  backgroundColor: Colors.grey[100],
+                  selectedColor: Theme.of(context).colorScheme.primary,
+                  checkmarkColor: Colors.white,
+                  side: BorderSide.none,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 16),
+      ],
     );
   }
 

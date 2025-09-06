@@ -1,25 +1,30 @@
-// pages/knowleage/models/knowledge_models.dart
+// loan-simulation/lib/pages/knowleage/models/knowledge_models.dart
+// 修正版 - JOINデータ対応
 
 /// 記事の基本情報を表すモデル（columnsテーブル）
 class ArticleColumn {
   final int id;
   final String title;
   final String? imageUrl;
-  final String category;
+  final int categoryId; // 必須に変更
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isPublished;
   final int sortOrder;
 
+  // JOIN時に取得されるカテゴリー情報（データベースには保存されない）
+  final String? categoryName; // JOINで取得
+
   ArticleColumn({
     required this.id,
     required this.title,
     this.imageUrl,
-    required this.category,
+    required this.categoryId, // 必須
     required this.createdAt,
     required this.updatedAt,
     this.isPublished = true,
     this.sortOrder = 0,
+    this.categoryName, // JOINで取得される場合のみ
   });
 
   factory ArticleColumn.fromJson(Map<String, dynamic> json) {
@@ -27,11 +32,12 @@ class ArticleColumn {
       id: json['id'],
       title: json['title'],
       imageUrl: json['image_url'],
-      category: json['category'],
+      categoryId: json['category_id'] ?? json['categories']?['id'], // JOINデータからも取得
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
       isPublished: json['is_published'] ?? true,
       sortOrder: json['sort_order'] ?? 0,
+      categoryName: json['categories']?['name'], // JOINで取得
     );
   }
 
@@ -40,7 +46,7 @@ class ArticleColumn {
       'id': id,
       'title': title,
       'image_url': imageUrl,
-      'category': category,
+      'category_id': categoryId,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'is_published': isPublished,
@@ -53,7 +59,7 @@ class ArticleColumn {
     return {
       'title': title,
       'image_url': imageUrl,
-      'category': category,
+      'category_id': categoryId,
       'is_published': isPublished,
       'sort_order': sortOrder,
     };
@@ -64,7 +70,7 @@ class ArticleColumn {
     return {
       'title': title,
       'image_url': imageUrl,
-      'category': category,
+      'category_id': categoryId,
       'updated_at': DateTime.now().toIso8601String(),
       'is_published': isPublished,
       'sort_order': sortOrder,
@@ -75,23 +81,29 @@ class ArticleColumn {
     int? id,
     String? title,
     String? imageUrl,
-    String? category,
+    int? categoryId,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isPublished,
     int? sortOrder,
+    String? categoryName,
   }) {
     return ArticleColumn(
       id: id ?? this.id,
       title: title ?? this.title,
       imageUrl: imageUrl ?? this.imageUrl,
-      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isPublished: isPublished ?? this.isPublished,
       sortOrder: sortOrder ?? this.sortOrder,
+      categoryName: categoryName ?? this.categoryName,
     );
   }
+
+  // 表示用のカテゴリー名取得（後方互換性のため）
+  String get category => categoryName ?? 'カテゴリー不明';
+  String get displayCategoryName => categoryName ?? 'カテゴリー不明';
 }
 
 /// 記事の詳細内容を表すモデル（column_detailsテーブル）
@@ -215,11 +227,12 @@ class KnowledgeArticle {
         id: data['column_id'] ?? data['id'],
         title: data['title'],
         imageUrl: data['image'],
-        category: data['category'],
+        categoryId: data['category_id'] ?? 0, // デフォルト値
         createdAt: DateTime.parse(data['created_at']),
         updatedAt: DateTime.now(), // updatedAtがない場合の代替
         isPublished: true, // デフォルト値
         sortOrder: 0, // デフォルト値
+        categoryName: data['category'], // 古い形式の場合
       ),
       detail: ColumnDetail(
         id: data['id'],
@@ -237,7 +250,9 @@ class KnowledgeArticle {
   int get id => column.id;
   String get title => column.title;
   String? get imageUrl => column.imageUrl;
-  String get category => column.category;
+  int get categoryId => column.categoryId;
+  String get category => column.category; // 後方互換性
+  String get categoryName => column.displayCategoryName;
   DateTime get createdAt => column.createdAt;
   bool get isPublished => column.isPublished;
   int get sortOrder => column.sortOrder;
@@ -263,7 +278,7 @@ class KnowledgeArticle {
 class CreateKnowledgeArticleDto {
   final String title;
   final String? imageUrl;
-  final String category;
+  final int categoryId; // カテゴリーIDで管理
   final bool isPublished;
   final int sortOrder;
   final String? toc;
@@ -273,7 +288,7 @@ class CreateKnowledgeArticleDto {
   CreateKnowledgeArticleDto({
     required this.title,
     this.imageUrl,
-    required this.category,
+    required this.categoryId,
     this.isPublished = true,
     this.sortOrder = 0,
     this.toc,
@@ -286,7 +301,7 @@ class CreateKnowledgeArticleDto {
     return {
       'title': title,
       'image_url': imageUrl,
-      'category': category,
+      'category_id': categoryId,
       'is_published': isPublished,
       'sort_order': sortOrder,
     };
@@ -307,7 +322,7 @@ class CreateKnowledgeArticleDto {
 class UpdateKnowledgeArticleDto {
   final String? title;
   final String? imageUrl;
-  final String? category;
+  final int? categoryId; // カテゴリーIDで管理
   final bool? isPublished;
   final int? sortOrder;
   final String? toc;
@@ -317,7 +332,7 @@ class UpdateKnowledgeArticleDto {
   UpdateKnowledgeArticleDto({
     this.title,
     this.imageUrl,
-    this.category,
+    this.categoryId,
     this.isPublished,
     this.sortOrder,
     this.toc,
@@ -333,7 +348,7 @@ class UpdateKnowledgeArticleDto {
 
     if (title != null) data['title'] = title;
     if (imageUrl != null) data['image_url'] = imageUrl;
-    if (category != null) data['category'] = category;
+    if (categoryId != null) data['category_id'] = categoryId;
     if (isPublished != null) data['is_published'] = isPublished;
     if (sortOrder != null) data['sort_order'] = sortOrder;
 
@@ -355,7 +370,7 @@ class UpdateKnowledgeArticleDto {
 
   /// Columnに更新する内容があるかチェック
   bool get hasColumnUpdates => 
-      title != null || imageUrl != null || category != null || 
+      title != null || imageUrl != null || categoryId != null || 
       isPublished != null || sortOrder != null;
 
   /// ColumnDetailに更新する内容があるかチェック
