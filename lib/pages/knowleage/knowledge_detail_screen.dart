@@ -1,12 +1,13 @@
 // loan-simulation/lib/pages/knowleage/knowleage_detail_screen.dart
-// 修正版 - import文の名前衝突を解決
+// Markdown対応版
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_hooks/flutter_hooks.dart' hide KnowledgeArticle; // KnowledgeArticleを除外
+import 'package:flutter_hooks/flutter_hooks.dart' hide KnowledgeArticle;
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/knowledge_providers.dart';
-import 'models/knowledge_models.dart'; // こちらのKnowledgeArticleを使用
+import 'models/knowledge_models.dart';
+import 'widgets/markdown_viewer.dart';
 
 class KnowleageDetailScreen extends HookConsumerWidget {
   final int columnId;
@@ -275,7 +276,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 目次（TOC）
+                // 目次（TOC）- Markdown対応
                 if (article.toc != null && article.toc!.isNotEmpty)
                   Container(
                     width: double.infinity,
@@ -297,13 +298,9 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          article.toc!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.blue[600],
-                            height: 1.6,
-                          ),
+                        // 目次もMarkdown対応
+                        SimpleMarkdownViewer(
+                          markdownContent: article.toc!,
                         ),
                       ],
                     ),
@@ -312,15 +309,10 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                 if (article.toc != null && article.toc!.isNotEmpty)
                   const SizedBox(height: 20),
 
-                // コンテンツ
+                // コンテンツ（Markdown対応）
                 if (article.content != null && article.content!.isNotEmpty)
-                  Text(
-                    article.content!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                      height: 1.7,
-                    ),
+                  UserMarkdownViewer(
+                    markdownContent: article.content!,
                   ),
 
                 if (article.content != null && article.content!.isNotEmpty)

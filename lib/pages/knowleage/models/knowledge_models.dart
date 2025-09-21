@@ -1,5 +1,5 @@
 // loan-simulation/lib/pages/knowleage/models/knowledge_models.dart
-// 修正版 - JOINデータ対応
+// ArticleImage追加版
 
 /// 記事の基本情報を表すモデル（columnsテーブル）
 class ArticleColumn {
@@ -188,6 +188,64 @@ class ColumnDetail {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
+  }
+}
+
+/// 記事内画像を表すモデル（article_imagesテーブル）- ユーザーアプリ用（表示専用）
+class ArticleImage {
+  final int? id;
+  final int columnId;
+  final String imageUrl;
+  final String? altText;
+  final String? caption;
+  final int displayOrder;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  ArticleImage({
+    this.id,
+    required this.columnId,
+    required this.imageUrl,
+    this.altText,
+    this.caption,
+    this.displayOrder = 0,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ArticleImage.fromJson(Map<String, dynamic> json) {
+    return ArticleImage(
+      id: json['id'],
+      columnId: json['column_id'],
+      imageUrl: json['image_url'],
+      altText: json['alt_text'],
+      caption: json['caption'],
+      displayOrder: json['display_order'] ?? 0,
+      createdAt: json['created_at'] != null 
+          ? DateTime.parse(json['created_at']) 
+          : null,
+      updatedAt: json['updated_at'] != null 
+          ? DateTime.parse(json['updated_at']) 
+          : null,
+    );
+  }
+
+  /// Markdown用のメソッド
+  String toMarkdownImage() {
+    if (altText != null && altText!.isNotEmpty) {
+      return '![${altText}](${imageUrl})';
+    } else {
+      return '![画像](${imageUrl})';
+    }
+  }
+
+  /// キャプション付きMarkdown
+  String toMarkdownWithCaption() {
+    String markdown = toMarkdownImage();
+    if (caption != null && caption!.isNotEmpty) {
+      markdown += '\n*${caption}*';
+    }
+    return markdown;
   }
 }
 

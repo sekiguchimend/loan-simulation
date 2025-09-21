@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:intl/intl.dart';
 import 'dart:math';
 
 class LoanSimulatorScreen extends HookConsumerWidget {
@@ -17,6 +18,41 @@ class LoanSimulatorScreen extends HookConsumerWidget {
     final interestRate = useState<double?>(null);
     final loanMonths = useState<double?>(null);
     final monthlyPaymentResult = useState<double?>(null);
+
+    // カンマ区切りのフォーマッター
+    final numberFormatter = NumberFormat('#,###');
+    final decimalFormatter = NumberFormat('#,###.##');
+
+    // 数値をカンマ区切り文字列に変換
+    String formatNumber(String value) {
+      if (value.isEmpty || value == '0') return value;
+      
+      // 小数点で終わる場合の処理
+      if (value.endsWith('.')) {
+        final intPart = value.substring(0, value.length - 1);
+        final numValue = double.tryParse(intPart);
+        if (numValue != null) {
+          return numberFormatter.format(numValue.toInt()) + '.';
+        }
+        return value;
+      }
+      
+      final numValue = double.tryParse(value);
+      if (numValue == null) return value;
+      
+      // 小数点がある場合
+      if (value.contains('.')) {
+        return decimalFormatter.format(numValue);
+      } else {
+        return numberFormatter.format(numValue.toInt());
+      }
+    }
+
+    // 表示用の数値文字列を取得
+    String getFormattedDisplay() {
+      // 常にフォーマットして表示
+      return formatNumber(display.value);
+    }
 
     void onNumberPressed(String number) {
       if (isNewInput.value) {
@@ -194,10 +230,10 @@ class LoanSimulatorScreen extends HookConsumerWidget {
     Widget getDisplayText() {
       List<Widget> children = [];
       
-      // メインの数字
+      // メインの数字（カンマ区切りでフォーマット）
       children.add(
         Text(
-          display.value,
+          getFormattedDisplay(),
           style: const TextStyle(
             fontSize: 48,
             fontWeight: FontWeight.w300,
