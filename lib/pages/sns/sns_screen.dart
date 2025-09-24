@@ -9,26 +9,32 @@ class SnsScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          '公式SNSアカウント',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            const SizedBox(height: 60),
-            
+            const SizedBox(height: 20),
             const Text(
-              '公式SNSアカウント',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              '最新情報をお届けしています',
+              '\\最新情報をお届けしています/',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey,
+                color: Color(0xFF323232),
+                fontWeight: FontWeight.bold
               ),
             ),
             const SizedBox(height: 40),
