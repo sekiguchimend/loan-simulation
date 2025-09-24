@@ -38,8 +38,8 @@ class SetupScreen extends HookConsumerWidget {
       body: Center(
         child: Image.asset(
           'assets/images/daikichi_logo.png',
-          width: 300,
-          height: 200,
+          width: 400,
+          height: 250,
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) {
             // 画像が見つからない場合は黒画面を表示

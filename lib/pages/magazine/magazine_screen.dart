@@ -19,17 +19,20 @@ class MagazineScreen extends HookConsumerWidget {
     final dbConnection = ref.watch(databaseConnectionProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('大吉マガジン'),
+        title: const Text(
+          '大吉マガジン',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        titleTextStyle: const TextStyle(
-          color: Colors.black87,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
+        surfaceTintColor: Colors.transparent,
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -37,16 +40,16 @@ class MagazineScreen extends HookConsumerWidget {
           ref.invalidate(magazineProvider);
           ref.invalidate(databaseConnectionProvider);
         },
-        child: SingleChildScrollView(
+        child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              // 説明部分
-              Container(
+          slivers: [
+            // 説明部分
+            SliverToBoxAdapter(
+              child: Container(
                 width: double.infinity,
                 height: 32,
                 color: Colors.grey[200],
-                child: Padding(
+                child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -59,35 +62,46 @@ class MagazineScreen extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                  ),
-              ),
-
-
-
-              // ブログリスト（パディングなし）
-              blogList.when(
-                data: (blogs) => blogs.isEmpty 
-                    ? const NoBlogCard()
-                    : Column(
-                        children: blogs.map((blog) => BlogCardWidget(
-                          blog: blog,
-                          onTap: () => _navigateToBlogDetail(context, blog),
-                        )).toList(),
-                      ),
-                loading: () => const Column(
-                  children: [
-                    BlogCardSkeleton(),
-                    BlogCardSkeleton(),
-                    BlogCardSkeleton(),
-                  ],
                 ),
-                error: (error, stack) => _buildBlogErrorCard('ブログの読み込みに失敗しました', error.toString(), ref),
               ),
-              
-              const SizedBox(height: 24),
-              
-              // マガジンセクション（パディングあり）
-              Padding(
+            ),
+
+            // ブログリスト
+            blogList.when(
+              data: (blogs) => blogs.isEmpty 
+                  ? const SliverToBoxAdapter(child: NoBlogCard())
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final blog = blogs[index];
+                          return BlogCardWidget(
+                            blog: blog,
+                            onTap: () => _navigateToBlogDetail(context, blog),
+                          );
+                        },
+                        childCount: blogs.length,
+                      ),
+                    ),
+              loading: () => SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+              error: (error, stack) => SliverToBoxAdapter(
+                child: _buildBlogErrorCard('ブログの読み込みに失敗しました', error.toString(), ref),
+              ),
+            ),
+            
+            // スペース
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 24),
+            ),
+            
+            // マガジンセクション
+            SliverToBoxAdapter(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: magazine.when(
                   data: (mag) => mag != null 
@@ -100,10 +114,13 @@ class MagazineScreen extends HookConsumerWidget {
                   error: (error, stack) => _buildMagazineErrorCard('マガジンの読み込みに失敗しました', error.toString(), ref),
                 ),
               ),
-              
-              const SizedBox(height: 16),
-            ],
-          ),
+            ),
+            
+            // ボトムスペース
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 24),
+            ),
+          ],
         ),
       ),
     );
@@ -166,7 +183,7 @@ class MagazineScreen extends HookConsumerWidget {
   Widget _buildMagazineErrorCard(String message, String errorDetails, WidgetRef ref) {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 180, // 200から180に縮小
       decoration: BoxDecoration(
         color: Colors.red[50],
         borderRadius: BorderRadius.circular(12),
@@ -177,20 +194,20 @@ class MagazineScreen extends HookConsumerWidget {
         children: [
           Icon(
             Icons.error_outline,
-            size: 48,
+            size: 40, // 48から40に縮小
             color: Colors.red[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12), // 16から12に縮小
           Text(
             message,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14, // 16から14に縮小
               color: Colors.red[700],
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12), // 16から12に縮小
           ElevatedButton(
             onPressed: () {
               ref.invalidate(magazineProvider);
@@ -198,8 +215,12 @@ class MagazineScreen extends HookConsumerWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[600],
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
-            child: const Text('再試行'),
+            child: const Text(
+              '再試行',
+              style: TextStyle(fontSize: 14),
+            ),
           ),
         ],
       ),
