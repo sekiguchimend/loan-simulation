@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'theme/app_theme.dart';
-import 'setup_screen.dart'; // SetupScreenをインポート
+import 'setup_screen.dart';
 import 'config/supabase_config.dart';
 
 void main() async {
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Supabase App',
       theme: AppTheme.lightTheme,
-      home: const SetupScreen(), // 最初にSetupScreenを表示
+      home: const SetupScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

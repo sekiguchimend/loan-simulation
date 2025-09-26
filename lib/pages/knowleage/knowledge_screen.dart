@@ -1,5 +1,4 @@
 // loan-simulation/lib/pages/knowleage/knowledge_screen.dart
-// 緊急修正版 - nullセーフ対応
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import '../../providers/knowledge_providers.dart';
 import 'knowledge_detail_screen.dart';
 import 'widgets/knowleage_tile_widget.dart';
-import 'models/knowledge_models.dart';
 
 class KnowleageScreen extends HookConsumerWidget {
   const KnowleageScreen({super.key});
