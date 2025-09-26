@@ -11,7 +11,7 @@ class ConsultScreen extends HookConsumerWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          'ご相談・お問い合わせ',
+          'お問い合わせ',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -23,115 +23,170 @@ class ConsultScreen extends HookConsumerWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height - 140, // AppBar分も考慮
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                '\\お気軽にご相談ください/',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF323232),
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-              const SizedBox(height: 40),
-              
-              // 相談ボタン
-              _buildConsultButton(
-                context: context,
-                url: 'https://daikichi-ir.com/contact/',
-              ),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height - 140,
+        child: Stack(
+          children: [
+            // 背景の装飾要素
+            _buildBackgroundDecorations(),
+            
+            // メインコンテンツ
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-              const SizedBox(height: 40,)
-            ],
-          ),
+                Image.asset(
+                  'assets/images/sendarrow.png',
+                   width: 250,
+                   height: 175,
+                   fit: BoxFit.contain,
+                 ),
+                
+                // "contact お問い合わせ" テキスト
+                Row(
+                  children: [
+                    SizedBox(width: 40,),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'contact',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Color(0xFFB50303),
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const Text(
+                          'お問い合わせ',
+                          style: TextStyle(
+                            fontSize: 22,
+                            color: Color(0xFF323232),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 32),
+                
+                // 説明文とリンク
+                _buildContactText(context),
+                
+                const SizedBox(height: 40),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildConsultButton({
-    required BuildContext context,
-    required String url,
-  }) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final buttonWidth = screenWidth * 0.9;
-    const buttonHeight = 80.0;
-
-    return Container(
-      width: buttonWidth,
-      height: buttonHeight,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+  Widget _buildBackgroundDecorations() {
+    return Stack(
+      children: [
+        
+        // 黒いボックス（右下）
+        Positioned(
+          bottom: 220,
+          right: 0,
+          child: Image.asset(
+            'assets/images/box1.png',
+            width: 80,
+            height: 80,
+            fit: BoxFit.contain,
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            // グラデーション背景
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF2196F3),
-                      Color(0xFF1976D2),
-                    ],
-                  ),
-                ),
+        ),
+        
+        // 灰色のボックス（左下）
+        Positioned(
+          bottom: 60,
+          left: 0,
+          child: Image.asset(
+            'assets/images/box2.png',
+            width: 80,
+            height: 80,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactText(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1行目
+          RichText(
+            textAlign: TextAlign.left,
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF323232),
+                height: 1.6,
+                fontWeight: FontWeight.w800
               ),
-            ),
-            
-            // 中央のアイコンとテキスト
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.chat_bubble_outline,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'ご相談はこちら',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              children: [
+                const TextSpan(
+                  text: '詳細な不動産に関するご質問は',
+                ),
+                WidgetSpan(
+                  child: GestureDetector(
+                    onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
+                    child: Container(
+                      child: Text(
+                        'こちら',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFFB50303),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            
-            // タップ処理用の透明レイヤー（最上部）
-            Positioned.fill(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => _launchUrl(url),
-                  splashColor: Colors.white.withOpacity(0.1),
-                  highlightColor: Colors.white.withOpacity(0.05),
-                  child: Container(),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // 2行目
+          RichText(
+            textAlign: TextAlign.left,
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF323232),
+                height: 1.6,
+                fontWeight: FontWeight.w800
+              ),
+              children: [
+                WidgetSpan(
+                  child: GestureDetector(
+                    onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
+                    child: Container(
+                      child: Text(
+                        'のリンク',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFFB50303),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const TextSpan(
+                  text: 'よりお問い合わせください。',
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
