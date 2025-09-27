@@ -28,9 +28,10 @@ class KnowleageScreen extends HookConsumerWidget {
         title: const Text(
           '不動産の知識',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
             color: Colors.black,
+            fontFamily: 'Noto Sans JP',
           ),
         ),
         centerTitle: true,
@@ -226,16 +227,16 @@ class KnowleageScreen extends HookConsumerWidget {
         child: Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: Colors.red[50],
+            color: const Color(0xFF660F15).withOpacity(0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.red[200]!),
+            border: Border.all(color: const Color(0xFF660F15).withOpacity(0.3)),
           ),
           child: Column(
             children: [
               Icon(
                 Icons.error_outline,
                 size: 64,
-                color: Colors.red[400],
+                color: const Color(0xFF660F15),
               ),
               const SizedBox(height: 24),
               Text(
@@ -243,7 +244,7 @@ class KnowleageScreen extends HookConsumerWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.red[700],
+                  color: const Color(0xFF660F15),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -252,7 +253,7 @@ class KnowleageScreen extends HookConsumerWidget {
                 'データベースへの接続に問題が発生している可能性があります。',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.red[600],
+                  color: const Color(0xFF660F15),
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -266,7 +267,7 @@ class KnowleageScreen extends HookConsumerWidget {
                   ));
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[600],
+                  backgroundColor: const Color(0xFF660F15),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),

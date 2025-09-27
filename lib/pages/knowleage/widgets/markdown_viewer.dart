@@ -113,7 +113,7 @@ class UserMarkdownViewer extends StatelessWidget {
         fontSize: 14,
         fontFamily: 'monospace',
         backgroundColor: Colors.grey[100],
-        color: Colors.red[800],
+        color: const Color(0xFF660F15),
       ),
       codeblockDecoration: BoxDecoration(
         color: Colors.grey[50],

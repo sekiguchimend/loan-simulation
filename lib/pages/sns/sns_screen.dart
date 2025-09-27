@@ -14,9 +14,10 @@ class SnsScreen extends HookConsumerWidget {
         title: const Text(
           '公式SNSアカウント',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
             color: Colors.black,
+            fontFamily: 'Noto Sans JP',
           ),
         ),
         centerTitle: true,
@@ -30,7 +31,7 @@ class SnsScreen extends HookConsumerWidget {
           children: [
             const SizedBox(height: 20),
             const Text(
-              '\\最新情報をお届けしています/',
+              '\\ 最新情報をお届けしています /',
               style: TextStyle(
                 fontSize: 16,
                 color: Color(0xFF323232),

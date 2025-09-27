@@ -12,11 +12,27 @@ import 'pages/consult/consult_screen.dart';
 final supabase = Supabase.instance.client;
 
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key});
+  final int? initialIndex;
+  const HomePage({super.key, this.initialIndex});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedIndex = useState(0);
+    // Check for arguments from navigation
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final int? routeIndex = args is int ? args : null;
+
+    final selectedIndex = useState(routeIndex ?? initialIndex ?? 0);
+
+    // Update selectedIndex when initialIndex or routeIndex changes
+    useEffect(() {
+      final index = initialIndex; // Create local variable to avoid promotion issue
+      if (routeIndex != null) {
+        selectedIndex.value = routeIndex;
+      } else if (index != null) {
+        selectedIndex.value = index;
+      }
+      return null;
+    }, [routeIndex, initialIndex]);
 
     final List<Widget> pages = [
       LoanSimulatorScreen(),

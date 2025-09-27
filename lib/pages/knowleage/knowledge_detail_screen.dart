@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/knowledge_providers.dart';
 import 'models/knowledge_models.dart';
 import 'widgets/markdown_viewer.dart';
+import '../../home.dart';
 
 class KnowleageDetailScreen extends HookConsumerWidget {
   final int columnId;
@@ -32,8 +33,9 @@ class KnowleageDetailScreen extends HookConsumerWidget {
           '不動産の知識',
           style: TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: Colors.black,
+            fontFamily: 'Noto Sans JP',
           ),
         ),
         centerTitle: true,
@@ -41,7 +43,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -61,6 +63,20 @@ class KnowleageDetailScreen extends HookConsumerWidget {
           return _buildDetailContent(context, article);
         },
       ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: 1, // Knowledge is at index 1
+        onTap: (index) {
+          if (index != 1) {
+            // Navigate to home with the selected index
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => HomePage(initialIndex: index),
+              ),
+              (route) => false,
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -76,7 +92,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
             Icon(
               Icons.error_outline,
               size: 80,
-              color: Colors.red[400],
+              color: const Color(0xFF660F15),
             ),
             const SizedBox(height: 24),
             Text(
@@ -84,7 +100,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.red[700],
+                color: const Color(0xFF660F15),
               ),
               textAlign: TextAlign.center,
             ),
@@ -93,7 +109,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
               'ネットワークの接続を確認するか、\n時間をおいて再度お試しください。',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.red[600],
+                color: const Color(0xFF660F15),
                 height: 1.6,
               ),
               textAlign: TextAlign.center,
@@ -107,7 +123,7 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                     ref.invalidate(columnDetailProvider(columnId));
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[600],
+                    backgroundColor: const Color(0xFF660F15),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),

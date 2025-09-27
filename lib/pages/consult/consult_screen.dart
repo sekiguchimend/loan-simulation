@@ -13,9 +13,10 @@ class ConsultScreen extends HookConsumerWidget {
         title: const Text(
           'お問い合わせ',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
             color: Colors.black,
+            fontFamily: 'Noto Sans JP',
           ),
         ),
         centerTitle: true,
@@ -32,6 +33,7 @@ class ConsultScreen extends HookConsumerWidget {
             
             // メインコンテンツ
             Column(
+              
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
 

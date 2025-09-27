@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'models/blog_magazine.dart';
 import '../../providers/magazine_providers.dart';
 import 'widgets/magazine_card_widget.dart';
+import '../../home.dart';
 
 class MagazineDetailScreen extends HookConsumerWidget {
   final BlogMagazine blog;
@@ -22,17 +23,21 @@ class MagazineDetailScreen extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('大吉マガジン'),
+        title: const Text(
+          '大吉マガジン',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+            fontFamily: 'Noto Sans JP',
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        titleTextStyle: const TextStyle(
-          color: Colors.black87,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
         iconTheme: const IconThemeData(
           color: Colors.black87,
+          size: 20,
         ),
       ),
       body: SingleChildScrollView(
@@ -125,6 +130,20 @@ class MagazineDetailScreen extends HookConsumerWidget {
             const SizedBox(height: 16),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: 2, // Magazine is at index 2
+        onTap: (index) {
+          if (index != 2) {
+            // Navigate to home with the selected index
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => HomePage(initialIndex: index),
+              ),
+              (route) => false,
+            );
+          }
+        },
       ),
     );
   }

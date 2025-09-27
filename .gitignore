@@ -53,3 +53,6 @@ app.*.map.json
 config/secrets.dart
 config/keys.dart
 lib/config/api_keys.dart
+
+# FVM関連
+.fvm/
