@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Supabase App',
+      title: 'Loan-Simulation',
       theme: AppTheme.lightTheme,
       home: const SetupScreen(),
       debugShowCheckedModeBanner: false,

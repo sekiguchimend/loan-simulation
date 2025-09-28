@@ -99,7 +99,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   Icon(
                     item['icon'] as IconData,
                     color: isSelected 
-                        ? Theme.of(context).colorScheme.primary 
+                        ? Color(0xFFD30B17) 
                         : Colors.grey,
                     size: 24,
                   ),
@@ -109,7 +109,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 9, // 少し小さめに
                       color: isSelected 
-                          ? Theme.of(context).colorScheme.primary 
+                          ? Color(0xFFD30B17) 
                           : Colors.grey,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),

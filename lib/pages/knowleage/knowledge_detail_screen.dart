@@ -232,8 +232,8 @@ class KnowleageDetailScreen extends HookConsumerWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(3),
+                      color: Color(0xFF660F15),
+                      borderRadius: BorderRadius.circular(0), // 角ばらせる
                     ),
                     child: Text(
                       article.category.isNotEmpty ? article.category : category ?? '',

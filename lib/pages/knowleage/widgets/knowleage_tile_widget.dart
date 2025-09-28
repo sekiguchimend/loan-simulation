@@ -17,8 +17,8 @@ class KnowleageTileWidget extends StatelessWidget {
   });
 
   Color _getCategoryColor(BuildContext context, String category) {
-    // フィルタリング部分と同じ色を使用
-    return Theme.of(context).colorScheme.primary;
+    // #660F15カラーを使用
+    return Color(0xFF660F15);
   }
 
   @override
@@ -78,7 +78,7 @@ class KnowleageTileWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // カテゴリータグ（フィルタリング部分と同じ色）
+                        // カテゴリータグ（角ばった形状、#660F15カラー）
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -86,7 +86,7 @@ class KnowleageTileWidget extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: _getCategoryColor(context, category),
-                            borderRadius: BorderRadius.circular(3),
+                            borderRadius: BorderRadius.circular(0), // 角ばらせる
                           ),
                           child: Text(
                             category,

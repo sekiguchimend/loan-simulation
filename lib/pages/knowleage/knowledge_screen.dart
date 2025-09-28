@@ -175,9 +175,12 @@ class KnowleageScreen extends HookConsumerWidget {
                     selectedCategory.value = category;
                   },
                   backgroundColor: Colors.grey[100],
-                  selectedColor: Theme.of(context).colorScheme.primary,
+                  selectedColor: Color(0xFF660F15),
                   checkmarkColor: Colors.white,
                   side: BorderSide.none,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0), // 角ばらせる
+                  ),
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
               );

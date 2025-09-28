@@ -24,34 +24,32 @@ class ConsultScreen extends HookConsumerWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height - 140,
-        child: Stack(
-          children: [
-            // 背景の装飾要素
-            _buildBackgroundDecorations(),
-            
-            // メインコンテンツ
-            Column(
-              
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-
+      body: Stack(
+        children: [
+          // メインコンテンツ
+          Center(
+            child: Transform.translate(
+              offset: const Offset(0, -90),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                 Image.asset(
                   'assets/images/sendarrow.png',
-                   width: 250,
-                   height: 175,
-                   fit: BoxFit.contain,
-                 ),
+                  width: 250,
+                  height: 175,
+                  fit: BoxFit.contain,
+                ),
+                
+                const SizedBox(height: 20),
                 
                 // "contact お問い合わせ" テキスト
                 Row(
                   children: [
-                    SizedBox(width: 40,),
+                    const SizedBox(width: 40),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'contact',
                           style: TextStyle(
                             fontSize: 20,
@@ -77,23 +75,26 @@ class ConsultScreen extends HookConsumerWidget {
                 
                 // 説明文とリンク
                 _buildContactText(context),
-                
-                const SizedBox(height: 40),
               ],
             ),
-          ],
-        ),
+          ),
+          ),
+          
+          // 背景の装飾要素
+          _buildBackgroundDecorations(context),
+        ],
       ),
     );
   }
 
-  Widget _buildBackgroundDecorations() {
+  Widget _buildBackgroundDecorations(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height - 140;
+    
     return Stack(
       children: [
-        
-        // 黒いボックス（右下）
+        // 黒いボックス（右上寄り - contactテキストの近く）
         Positioned(
-          bottom: 220,
+          top: screenHeight * 0.30,
           right: 0,
           child: Image.asset(
             'assets/images/box1.png',
@@ -103,9 +104,9 @@ class ConsultScreen extends HookConsumerWidget {
           ),
         ),
         
-        // 灰色のボックス（左下）
+        // 灰色のボックス（左下寄り - 最後のコンテンツの近く）
         Positioned(
-          bottom: 60,
+          top: screenHeight * 0.75,
           left: 0,
           child: Image.asset(
             'assets/images/box2.png',
@@ -141,14 +142,12 @@ class ConsultScreen extends HookConsumerWidget {
                 WidgetSpan(
                   child: GestureDetector(
                     onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
-                    child: Container(
-                      child: Text(
-                        'こちら',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFFB50303),
-                          fontWeight: FontWeight.w900,
-                        ),
+                    child: const Text(
+                      'こちら',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFFB50303),
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
@@ -170,14 +169,12 @@ class ConsultScreen extends HookConsumerWidget {
                 WidgetSpan(
                   child: GestureDetector(
                     onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
-                    child: Container(
-                      child: Text(
-                        'のリンク',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFFB50303),
-                          fontWeight: FontWeight.w900,
-                        ),
+                    child: const Text(
+                      'のリンク',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFFB50303),
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
