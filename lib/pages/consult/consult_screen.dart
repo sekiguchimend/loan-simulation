@@ -29,7 +29,7 @@ class ConsultScreen extends HookConsumerWidget {
           // メインコンテンツ
           Center(
             child: Transform.translate(
-              offset: const Offset(0, -90),
+              offset: const Offset(0, -90), // 90px上に移動
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -120,73 +120,77 @@ class ConsultScreen extends HookConsumerWidget {
   }
 
   Widget _buildContactText(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1行目
-          RichText(
-            textAlign: TextAlign.left,
-            text: TextSpan(
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF323232),
-                height: 1.6,
-                fontWeight: FontWeight.w800
-              ),
-              children: [
-                const TextSpan(
-                  text: '詳細な不動産に関するご質問は',
-                ),
-                WidgetSpan(
-                  child: GestureDetector(
-                    onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
-                    child: const Text(
-                      'こちら',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFFB50303),
-                        fontWeight: FontWeight.w900,
+    return Row(
+      children: [
+        const SizedBox(width: 40),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1行目
+              RichText(
+                textAlign: TextAlign.left,
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF323232),
+                    height: 1.6,
+                    fontWeight: FontWeight.w800
+                  ),
+                  children: [
+                    const TextSpan(
+                      text: '詳細な不動産に関するご質問は',
+                    ),
+                    WidgetSpan(
+                      child: GestureDetector(
+                        onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
+                        child: const Text(
+                          'こちら',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFFB50303),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          // 2行目
-          RichText(
-            textAlign: TextAlign.left,
-            text: TextSpan(
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF323232),
-                height: 1.6,
-                fontWeight: FontWeight.w800
               ),
-              children: [
-                WidgetSpan(
-                  child: GestureDetector(
-                    onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
-                    child: const Text(
-                      'のリンク',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFFB50303),
-                        fontWeight: FontWeight.w900,
+              // 2行目
+              RichText(
+                textAlign: TextAlign.left,
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF323232),
+                    height: 1.6,
+                    fontWeight: FontWeight.w800
+                  ),
+                  children: [
+                    WidgetSpan(
+                      child: GestureDetector(
+                        onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
+                        child: const Text(
+                          'のリンク',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFFB50303),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const TextSpan(
+                      text: 'よりお問い合わせください。',
+                    ),
+                  ],
                 ),
-                const TextSpan(
-                  text: 'よりお問い合わせください。',
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
