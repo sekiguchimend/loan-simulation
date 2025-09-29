@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SnsScreen extends HookConsumerWidget {
   const SnsScreen({super.key});
@@ -14,10 +15,8 @@ class SnsScreen extends HookConsumerWidget {
         title: const Text(
           '公式SNSアカウント',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
-            fontFamily: 'Noto Sans JP',
           ),
         ),
         centerTitle: true,
@@ -25,19 +24,42 @@ class SnsScreen extends HookConsumerWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            const Text(
-              '\\ 最新情報をお届けしています /',
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFF323232),
-                fontWeight: FontWeight.bold
+      body: Column(
+        children: [
+          // 説明部分（ヘッダー下の装飾）
+          Container(
+            width: double.infinity,
+            height: 32,
+            color: Colors.grey[200],
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '社長の大吉日記、大吉最新NEWSなど',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w900
+                  ),
+                ),
               ),
             ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    '\\ 最新情報をお届けしています ! /',
+                    style: GoogleFonts.notoSansJp(
+                      fontSize: 16,
+                      color: Color(0xFF323232),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
             const SizedBox(height: 40),
             
             // YouTube ボタン
@@ -84,8 +106,11 @@ class SnsScreen extends HookConsumerWidget {
             ),
             
             const SizedBox(height: 40),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -106,17 +131,10 @@ class SnsScreen extends HookConsumerWidget {
       width: buttonWidth,
       height: buttonHeight,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: colors[0].withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(0),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(0),
         child: Stack(
           children: [
             // 背景画像（ボタン全体に表示）

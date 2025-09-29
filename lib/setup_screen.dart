@@ -39,7 +39,7 @@ class SetupScreen extends HookConsumerWidget {
       backgroundColor: const Color(0xFF000000),
       body: Center(
         child: Image.asset(
-          'assets/images/daikichi_logo.png',
+          'assets/images/daikich_logo.png',
           width: 400,
           height: 250,
           fit: BoxFit.contain,

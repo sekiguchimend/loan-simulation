@@ -75,8 +75,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
     ];
 
     return Container(
-      height: 80,
-      decoration: BoxDecoration(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom * 1.5),
+      child: Container(
+        height: 60, // SafeAreaを考慮した適切な高さ
+        decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           top: BorderSide(
@@ -98,10 +100,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 children: [
                   Icon(
                     item['icon'] as IconData,
-                    color: isSelected 
-                        ? Color(0xFFD30B17) 
+                    color: isSelected
+                        ? Color(0xFFD30B17)
                         : Colors.grey,
-                    size: 24,
+                    size: 22,
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -121,6 +123,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             ),
           );
         }),
+      ),
       ),
     );
   }

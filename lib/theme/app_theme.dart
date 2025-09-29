@@ -46,10 +46,11 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         foregroundColor: textColor,
+        toolbarHeight: 40, // デフォルトの56から40に変更（SafeAreaを考慮した適切な高さ）
         titleTextStyle: GoogleFonts.notoSansJp(
           color: textColor,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
         ),
       ),
       

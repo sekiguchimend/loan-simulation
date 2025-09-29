@@ -32,10 +32,8 @@ class KnowleageDetailScreen extends HookConsumerWidget {
         title: const Text(
           '不動産の知識',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
-            fontFamily: 'Noto Sans JP',
           ),
         ),
         centerTitle: true,
