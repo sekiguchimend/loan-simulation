@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart'; ← 削除
 
 class AppTheme {
   // カラー定数
@@ -21,36 +21,38 @@ class AppTheme {
       // 背景色
       scaffoldBackgroundColor: backgroundColor,
       
+      // デフォルトフォントをNotoSansJPに設定
+      fontFamily: 'NotoSansJP',
+      
       // フォント設定
-      textTheme: GoogleFonts.notoSansJpTextTheme(
-        ThemeData.light().textTheme.copyWith(
-          bodyLarge: const TextStyle(color: textColor),
-          bodyMedium: const TextStyle(color: textColor),
-          bodySmall: const TextStyle(color: textColor),
-          headlineLarge: const TextStyle(color: textColor),
-          headlineMedium: const TextStyle(color: textColor),
-          headlineSmall: const TextStyle(color: textColor),
-          titleLarge: const TextStyle(color: textColor),
-          titleMedium: const TextStyle(color: textColor),
-          titleSmall: const TextStyle(color: textColor),
-          labelLarge: const TextStyle(color: textColor),
-          labelMedium: const TextStyle(color: textColor),
-          labelSmall: const TextStyle(color: textColor),
-          displayLarge: const TextStyle(color: textColor),
-          displayMedium: const TextStyle(color: textColor),
-          displaySmall: const TextStyle(color: textColor),
-        ),
+      textTheme: ThemeData.light().textTheme.copyWith(
+        bodyLarge: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        bodyMedium: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        bodySmall: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        headlineLarge: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        headlineMedium: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        headlineSmall: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        titleLarge: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        titleMedium: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        titleSmall: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        labelLarge: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        labelMedium: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        labelSmall: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        displayLarge: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        displayMedium: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
+        displaySmall: const TextStyle(color: textColor, fontFamily: 'NotoSansJP'),
       ),
       
       // AppBarテーマ
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         foregroundColor: textColor,
         toolbarHeight: 40, // デフォルトの56から40に変更（SafeAreaを考慮した適切な高さ）
-        titleTextStyle: GoogleFonts.notoSansJp(
+        titleTextStyle: TextStyle(
           color: textColor,
           fontSize: 14,
           fontWeight: FontWeight.w700,
+          fontFamily: 'NotoSansJP',
         ),
       ),
       

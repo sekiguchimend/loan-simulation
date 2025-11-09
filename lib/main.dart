@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 import 'theme/app_theme.dart';
 import 'setup_screen.dart';
 import 'config/supabase_config.dart';
@@ -11,11 +11,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Google Fontsをプリキャッシュ
-  await Future.wait([
-    precacheGoogleFont(GoogleFonts.notoSansJp(fontWeight: FontWeight.w700)),
-    precacheGoogleFont(GoogleFonts.notoSansJp(fontWeight: FontWeight.w800)),
-    precacheGoogleFont(GoogleFonts.notoSansJp(fontWeight: FontWeight.w900)),
-  ]);
+  // await Future.wait([
+  //   precacheGoogleFont(GoogleFonts.notoSansJp(fontWeight: FontWeight.w700)),
+  //   precacheGoogleFont(GoogleFonts.notoSansJp(fontWeight: FontWeight.w800)),
+  //   precacheGoogleFont(GoogleFonts.notoSansJp(fontWeight: FontWeight.w900)),
+  // ]);
 
   // .envファイルの読み込みを試行
   try {
@@ -45,13 +45,13 @@ void main() async {
   );
 }
 
-Future<void> precacheGoogleFont(TextStyle style) async {
-  try {
-    await GoogleFonts.pendingFonts([style]);
-  } catch (e) {
-    print('Font preload error: $e');
-  }
-}
+// Future<void> precacheGoogleFont(TextStyle style) async {
+//   try {
+//     await GoogleFonts.pendingFonts([style]);
+//   } catch (e) {
+//     print('Font preload error: $e');
+//   }
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

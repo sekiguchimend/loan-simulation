@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 
 class SnsScreen extends HookConsumerWidget {
   const SnsScreen({super.key});
@@ -54,7 +54,13 @@ class SnsScreen extends HookConsumerWidget {
                   const SizedBox(height: 20),
                   Text(
                     '\\ 最新情報をお届けしています ! /',
-                    style: GoogleFonts.notoSansJp(
+                    // style: GoogleFonts.notoSansJp(
+                    //   fontSize: 16,
+                    //   color: Color(0xFF323232),
+                    //   fontWeight: FontWeight.bold,
+                    // ),
+                    style: TextStyle(
+                      fontFamily: 'NotoSansJP',
                       fontSize: 16,
                       color: Color(0xFF323232),
                       fontWeight: FontWeight.bold,

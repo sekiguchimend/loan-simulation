@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:flutter_hooks/flutter_hooks.dart';
 
 class ConsultScreen extends HookConsumerWidget {
   const ConsultScreen({super.key});
@@ -84,7 +84,7 @@ class ConsultScreen extends HookConsumerWidget {
                                   children: [
                                     Text(
                                       'contact',
-                                      style: GoogleFonts.notoSansJp(
+                                      style: TextStyle(
                                         fontSize: 20,
                                         color: Color(0xFFB50303),
                                         fontWeight: FontWeight.w800,
@@ -93,7 +93,7 @@ class ConsultScreen extends HookConsumerWidget {
                                     ),
                                     Text(
                                       'お問い合わせ',
-                                      style: GoogleFonts.notoSansJp(
+                                      style: TextStyle(
                                         fontSize: 22,
                                         color: Color(0xFF323232),
                                         fontWeight: FontWeight.w800,
