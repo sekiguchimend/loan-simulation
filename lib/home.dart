@@ -75,10 +75,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
     ];
 
     return Container(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom * 1.5),
-      child: Container(
-        height: 60, // SafeAreaを考慮した適切な高さ
-        decoration: BoxDecoration(
+      decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           top: BorderSide(
@@ -87,43 +84,48 @@ class CustomBottomNavigationBar extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        children: List.generate(items.length, (index) {
-          final isSelected = index == selectedIndex;
-          final item = items[index];
-          
-          return Expanded(
-            child: InkWell(
-              onTap: () => onTap(index),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    item['icon'] as IconData,
-                    color: isSelected
-                        ? Color(0xFFD30B17)
-                        : Colors.grey,
-                    size: 22,
+      child: SafeArea(
+        child: Container(
+          height: 80,
+          padding: EdgeInsets.only(bottom: 15),
+          child: Row(
+            children: List.generate(items.length, (index) {
+              final isSelected = index == selectedIndex;
+              final item = items[index];
+
+              return Expanded(
+                child: InkWell(
+                  onTap: () => onTap(index),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        item['icon'] as IconData,
+                        color: isSelected
+                            ? Color(0xFFD30B17)
+                            : Colors.grey,
+                        size: 24,
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        item['label'] as String,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isSelected
+                              ? Color(0xFFD30B17)
+                              : Colors.grey,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 4),
-                  Text(
-                    item['label'] as String,
-                    style: TextStyle(
-                      fontSize: 9, // 少し小さめに
-                      color: isSelected 
-                          ? Color(0xFFD30B17) 
-                          : Colors.grey,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2, // 最大2行まで許可
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
+                ),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }

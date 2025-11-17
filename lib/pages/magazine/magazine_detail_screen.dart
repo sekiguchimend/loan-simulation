@@ -26,8 +26,8 @@ class MagazineDetailScreen extends HookConsumerWidget {
         title: const Text(
           '大吉マガジン',
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
           ),
         ),
         centerTitle: true,

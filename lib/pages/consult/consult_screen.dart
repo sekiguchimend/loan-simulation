@@ -16,8 +16,8 @@ class ConsultScreen extends HookConsumerWidget {
         title: const Text(
           'お問い合わせ',
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
           ),
         ),
         centerTitle: true,
@@ -37,7 +37,7 @@ class ConsultScreen extends HookConsumerWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '大吉最新NEWSなど',
+                  'お気軽にお問い合わせください',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.black87,
@@ -59,23 +59,29 @@ class ConsultScreen extends HookConsumerWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset(
-                              'assets/images/sendarrow.png',
-                              width: 250,
-                              height: 175,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: 250,
-                                  height: 175,
-                                  color: Colors.transparent,
-                                );
-                              },
+                            Transform.translate(
+                              offset: const Offset(0, -40),
+                              child: Image.asset(
+                                'assets/images/sendarrow.png',
+                                width: 180,
+                                height: 140,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 180,
+                                    height: 140,
+                                    color: Colors.transparent,
+                                  );
+                                },
+                              ),
                             ),
 
                             const SizedBox(height: 20),
 
                             // "contact お問い合わせ" テキスト
+                            Transform.translate(
+                                offset: const Offset(0, -30), // 👈 Y方向に -30px
+                            child:
                             Row(
                               children: [
                                 const SizedBox(width: 40),
@@ -85,29 +91,35 @@ class ConsultScreen extends HookConsumerWidget {
                                     Text(
                                       'contact',
                                       style: GoogleFonts.notoSansJp(
-                                        fontSize: 20,
+                                        fontSize: 28,
                                         color: Color(0xFFB50303),
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w900,
                                         letterSpacing: 1.2,
+                                        height: 1.0,
                                       ),
                                     ),
                                     Text(
                                       'お問い合わせ',
                                       style: GoogleFonts.notoSansJp(
-                                        fontSize: 22,
+                                        fontSize: 32,
                                         color: Color(0xFF323232),
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w900,
                                       ),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
-
-                            const SizedBox(height: 32),
+                            ),
+                            const SizedBox(height: 16),
 
                             // 説明文とリンク
-                            _buildContactText(context),
+                            // 説明文とリンク
+Transform.translate(
+  offset: const Offset(0, -30), // 👈 30px 上へ
+  child: _buildContactText(context),
+),
+
                           ],
                         ),
                       ),
@@ -134,24 +146,24 @@ class ConsultScreen extends HookConsumerWidget {
           children: [
             // 黒いボックス（右上寄り - contactテキストの近く）
             Positioned(
-              top: screenHeight * 0.30,
+              top: screenHeight * 0.20,
           right: 0,
           child: Image.asset(
             'assets/images/box1.png',
-            width: 80,
-            height: 80,
+            width: 100,
+            height: 100,
             fit: BoxFit.contain,
           ),
         ),
-        
+
         // 灰色のボックス（左下寄り - 最後のコンテンツの近く）
         Positioned(
           top: screenHeight * 0.75,
           left: 0,
           child: Image.asset(
             'assets/images/box2.png',
-            width: 80,
-            height: 80,
+            width: 100,
+            height: 100,
             fit: BoxFit.contain,
           ),
         ),
@@ -174,7 +186,7 @@ class ConsultScreen extends HookConsumerWidget {
                 textAlign: TextAlign.left,
                 text: TextSpan(
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 20,
                     color: Color(0xFF323232),
                     height: 1.6,
                     fontWeight: FontWeight.w800
@@ -189,7 +201,7 @@ class ConsultScreen extends HookConsumerWidget {
                         child: const Text(
                           'こちら',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 22,
                             color: Color(0xFFB50303),
                             fontWeight: FontWeight.w900,
                           ),
@@ -204,7 +216,7 @@ class ConsultScreen extends HookConsumerWidget {
                 textAlign: TextAlign.left,
                 text: TextSpan(
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 20,
                     color: Color(0xFF323232),
                     height: 1.6,
                     fontWeight: FontWeight.w800
@@ -216,7 +228,7 @@ class ConsultScreen extends HookConsumerWidget {
                         child: const Text(
                           'のリンク',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 22,
                             color: Color(0xFFB50303),
                             fontWeight: FontWeight.w900,
                           ),
