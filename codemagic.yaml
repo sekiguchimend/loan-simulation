@@ -21,7 +21,7 @@ workflows:
           set -e
           flutter pub get
       
-      - name: Build iOS
+      - name: Build iOS app
         script: |
           #!/bin/sh
           set -e
