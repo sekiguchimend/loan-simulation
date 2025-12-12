@@ -493,6 +493,7 @@ class LoanSimulatorScreen extends HookConsumerWidget {
               ),
             ),
           ),
+          SizedBox(height: 16), // 下部余白
         ],
       ),
       ),
