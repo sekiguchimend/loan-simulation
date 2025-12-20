@@ -123,20 +123,30 @@ class LoanSimulatorScreen extends HookConsumerWidget {
         final principal = loanAmount.value!;
         final monthlyRate = interestRate.value! / 100 / 12;
         final totalMonths = loanMonths.value!;
-        
+
+        // 無効な値のチェック
+        if (principal <= 0 || totalMonths < 1) {
+          return;
+        }
+
         double monthlyPayment;
         if (monthlyRate == 0) {
           // 金利0%の場合
           monthlyPayment = principal / totalMonths;
         } else {
-          monthlyPayment = principal * 
-            (monthlyRate * pow(1 + monthlyRate, totalMonths)) / 
+          monthlyPayment = principal *
+            (monthlyRate * pow(1 + monthlyRate, totalMonths)) /
             (pow(1 + monthlyRate, totalMonths) - 1);
         }
-        
+
+        // NaNや無限大のチェック
+        if (monthlyPayment.isNaN || monthlyPayment.isInfinite) {
+          return;
+        }
+
         monthlyPaymentResult.value = monthlyPayment;
         display.value = monthlyPayment.toStringAsFixed(0);
-        
+
         // 結果表示状態に移行
         loanStep.value = 3;
       }
@@ -168,18 +178,24 @@ class LoanSimulatorScreen extends HookConsumerWidget {
 
       switch (loanStep.value) {
         case 0:
+          // 借入額は0より大きい必要がある
+          if (currentValue <= 0) return;
           loanAmount.value = currentValue;
           loanStep.value = 1;
           display.value = '0';
           isNewInput.value = true;
           break;
         case 1:
+          // 金利は0以上である必要がある（0%も許可）
+          if (currentValue < 0) return;
           interestRate.value = currentValue;
           loanStep.value = 2;
           display.value = '0';
           isNewInput.value = true;
           break;
         case 2:
+          // 返済月数は1以上である必要がある
+          if (currentValue < 1) return;
           loanMonths.value = currentValue;
           calculateLoanPayment();
           break;

@@ -16,8 +16,8 @@ class ConsultScreen extends HookConsumerWidget {
         title: const Text(
           'お問い合わせ',
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
           ),
         ),
         centerTitle: true,
@@ -61,8 +61,8 @@ class ConsultScreen extends HookConsumerWidget {
                           children: [
                             Image.asset(
                               'assets/images/sendarrow.png',
-                              width: 250,
-                              height: 175,
+                              width: 150,
+                              height: 105,
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
@@ -85,18 +85,18 @@ class ConsultScreen extends HookConsumerWidget {
                                     Text(
                                       'contact',
                                       style: TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 28,
                                         color: Color(0xFFB50303),
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w900,
                                         letterSpacing: 1.2,
                                       ),
                                     ),
                                     Text(
                                       'お問い合わせ',
                                       style: TextStyle(
-                                        fontSize: 22,
+                                        fontSize: 32,
                                         color: Color(0xFF323232),
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w900,
                                       ),
                                     ),
                                   ],
@@ -174,27 +174,14 @@ class ConsultScreen extends HookConsumerWidget {
                 textAlign: TextAlign.left,
                 text: TextSpan(
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     color: Color(0xFF323232),
-                    height: 1.6,
+                    height: 1.8,
                     fontWeight: FontWeight.w800
                   ),
                   children: [
                     const TextSpan(
-                      text: '詳細な不動産に関するご質問は',
-                    ),
-                    WidgetSpan(
-                      child: GestureDetector(
-                        onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
-                        child: const Text(
-                          'こちら',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFFB50303),
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
+                      text: '不動産投資や物件に関する',
                     ),
                   ],
                 ),
@@ -204,19 +191,22 @@ class ConsultScreen extends HookConsumerWidget {
                 textAlign: TextAlign.left,
                 text: TextSpan(
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     color: Color(0xFF323232),
-                    height: 1.6,
+                    height: 1.8,
                     fontWeight: FontWeight.w800
                   ),
                   children: [
+                    const TextSpan(
+                      text: 'ご質問・ご相談は',
+                    ),
                     WidgetSpan(
                       child: GestureDetector(
                         onTap: () => _launchUrl('https://daikichi-ir.com/contact/'),
                         child: const Text(
-                          'のリンク',
+                          'こちらのリンク',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: Color(0xFFB50303),
                             fontWeight: FontWeight.w900,
                           ),
@@ -224,7 +214,42 @@ class ConsultScreen extends HookConsumerWidget {
                       ),
                     ),
                     const TextSpan(
-                      text: 'よりお問い合わせください。',
+                      text: 'より',
+                    ),
+                  ],
+                ),
+              ),
+              // 3行目
+              RichText(
+                textAlign: TextAlign.left,
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF323232),
+                    height: 1.8,
+                    fontWeight: FontWeight.w800
+                  ),
+                  children: [
+                    const TextSpan(
+                      text: 'お気軽にお問い合わせください。',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              // 4行目
+              RichText(
+                textAlign: TextAlign.left,
+                text: const TextSpan(
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF323232),
+                    height: 1.8,
+                    fontWeight: FontWeight.w800
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '専門スタッフが丁寧にご対応いたします。',
                     ),
                   ],
                 ),
