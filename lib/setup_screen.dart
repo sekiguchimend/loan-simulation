@@ -12,7 +12,7 @@ class SetupScreen extends HookConsumerWidget {
     
     useEffect(() {
       // Timerを使用してキャンセル可能にする
-      final timer = Timer(const Duration(seconds: 3), () {
+      final timer = Timer(const Duration(milliseconds: 1000), () {
         if (context.mounted) {
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
@@ -38,16 +38,43 @@ class SetupScreen extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF000000),
       body: Center(
-        child: Image.asset(
-          'assets/images/daikich_logo.png',
-          width: 400,
-          height: 250,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: const Color(0xFF000000),
-            );
-          },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Image.asset(
+                  'assets/images/daikich_logo.png',
+                  width: 400,
+                  height: 250,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: const Color(0xFF000000),
+                    );
+                  },
+                ),
+                Positioned(
+                  top: 30,
+                  left: 0,
+                  right: 0,
+                  child: const Center(
+                    child: Text(
+                      '＼ 不動産投資のことなら ／',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'NotoSansJP',
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
