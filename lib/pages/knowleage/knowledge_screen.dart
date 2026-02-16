@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/knowledge_providers.dart';
-import 'knowledge_detail_screen.dart';
 import 'widgets/knowleage_tile_widget.dart';
 
 class KnowleageScreen extends HookConsumerWidget {
@@ -118,15 +118,10 @@ class KnowleageScreen extends HookConsumerWidget {
                         imageUrl: column.imageUrl ?? '',
                         category: column.category, // 後方互換性プロパティを使用
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => KnowleageDetailScreen(
-                                columnId: column.id,
-                                title: column.title,
-                                category: column.category,
-                              ),
-                            ),
-                          );
+                          // URLが設定されている場合は外部リンクを開く
+                          if (column.url != null && column.url!.isNotEmpty) {
+                            _launchUrl(column.url!);
+                          }
                         },
                       );
                     },
@@ -285,5 +280,16 @@ class KnowleageScreen extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    try {
+      final Uri url = Uri.parse(urlString);
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $urlString');
+      }
+    } catch (e) {
+      print('URL起動エラー: $e');
+    }
   }
 }

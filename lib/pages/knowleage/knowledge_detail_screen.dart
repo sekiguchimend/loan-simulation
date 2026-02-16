@@ -62,9 +62,9 @@ class KnowleageDetailScreen extends HookConsumerWidget {
         },
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: 1, // Knowledge is at index 1
+        selectedIndex: 2, // Knowledge is at index 2
         onTap: (index) {
-          if (index != 1) {
+          if (index != 2) {
             // Navigate to home with the selected index
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(

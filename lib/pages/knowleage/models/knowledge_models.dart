@@ -6,6 +6,7 @@ class ArticleColumn {
   final int id;
   final String title;
   final String? imageUrl;
+  final String? url; // 外部リンクURL
   final int categoryId; // 必須に変更
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -19,6 +20,7 @@ class ArticleColumn {
     required this.id,
     required this.title,
     this.imageUrl,
+    this.url,
     required this.categoryId, // 必須
     required this.createdAt,
     required this.updatedAt,
@@ -32,6 +34,7 @@ class ArticleColumn {
       id: json['id'],
       title: json['title'],
       imageUrl: json['image_url'],
+      url: json['url'],
       categoryId: json['category_id'] ?? json['categories']?['id'], // JOINデータからも取得
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
@@ -46,6 +49,7 @@ class ArticleColumn {
       'id': id,
       'title': title,
       'image_url': imageUrl,
+      'url': url,
       'category_id': categoryId,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -59,6 +63,7 @@ class ArticleColumn {
     return {
       'title': title,
       'image_url': imageUrl,
+      'url': url,
       'category_id': categoryId,
       'is_published': isPublished,
       'sort_order': sortOrder,
@@ -70,6 +75,7 @@ class ArticleColumn {
     return {
       'title': title,
       'image_url': imageUrl,
+      'url': url,
       'category_id': categoryId,
       'updated_at': DateTime.now().toIso8601String(),
       'is_published': isPublished,
@@ -81,6 +87,7 @@ class ArticleColumn {
     int? id,
     String? title,
     String? imageUrl,
+    String? url,
     int? categoryId,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -92,6 +99,7 @@ class ArticleColumn {
       id: id ?? this.id,
       title: title ?? this.title,
       imageUrl: imageUrl ?? this.imageUrl,
+      url: url ?? this.url,
       categoryId: categoryId ?? this.categoryId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

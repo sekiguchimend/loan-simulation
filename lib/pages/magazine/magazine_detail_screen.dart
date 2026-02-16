@@ -130,9 +130,9 @@ class MagazineDetailScreen extends HookConsumerWidget {
         ),
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: 2, // Magazine is at index 2
+        selectedIndex: 3, // Magazine is at index 3
         onTap: (index) {
-          if (index != 2) {
+          if (index != 3) {
             // Navigate to home with the selected index
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(

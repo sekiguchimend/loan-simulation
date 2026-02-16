@@ -1,12 +1,8 @@
 // pages/magazine/magazine_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'models/blog_magazine.dart';
 import '../../providers/magazine_providers.dart';
-import 'magazine_detail_screen.dart';
-import 'widgets/blog_card_widget.dart';
 import 'widgets/magazine_card_widget.dart';
 
 class MagazineScreen extends HookConsumerWidget {
@@ -14,9 +10,7 @@ class MagazineScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final blogList = ref.watch(blogListProvider);
     final magazine = ref.watch(magazineProvider);
-    // final dbConnection = ref.watch(databaseConnectionProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -33,156 +27,151 @@ class MagazineScreen extends HookConsumerWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(blogListProvider);
-          ref.invalidate(magazineProvider);
-          ref.invalidate(databaseConnectionProvider);
-        },
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            // 説明部分
-            SliverToBoxAdapter(
-              child: Container(
-                width: double.infinity,
-                height: 32,
-                color: Colors.grey[200],
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '社長の大吉日記、大吉最新NEWSなど',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w900
-                      ),
-                    ),
+      body: Column(
+        children: [
+          // 説明部分
+          Container(
+            width: double.infinity,
+            height: 32,
+            color: Colors.grey[200],
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '大吉不動産の最新情報をお届け',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w900
                   ),
                 ),
               ),
             ),
+          ),
 
-            // ブログリスト
-            blogList.when(
-              data: (blogs) => blogs.isEmpty 
-                  ? const SliverToBoxAdapter(child: NoBlogCard())
-                  : SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final blog = blogs[index];
-                          return BlogCardWidget(
-                            blog: blog,
-                            onTap: () => _navigateToBlogDetail(context, blog),
-                          );
-                        },
-                        childCount: blogs.length,
-                      ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+
+                  // ヘッダーセクション
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        // Magazine タイトル
+                        const Text(
+                          'Magazine',
+                          style: TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF323232),
+                            letterSpacing: -1,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // 大吉マガジン
+                        const Text(
+                          '大吉マガジン',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF323232),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // 赤い横線
+                        Container(
+                          width: 40,
+                          height: 3,
+                          color: const Color(0xFFB50303),
+                        ),
+                        const SizedBox(height: 24),
+                        // サブテキスト
+                        const Text(
+                          '社長の大吉日記、大吉最新NEWSなど',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF323232),
+                          ),
+                        ),
+                      ],
                     ),
-              loading: () => SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).colorScheme.primary,
                   ),
-                ),
+
+                  const SizedBox(height: 40),
+
+                  // 説明テキスト
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        Text(
+                          '大吉マガジンでは',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF323232),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '不動産投資に関する最新情報や\n社長の大吉日記、大吉最新NEWSなど\nお役立ち情報をお届けしています。',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF666666),
+                            height: 1.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // マガジンカード
+                  magazine.when(
+                    data: (mag) => mag != null
+                        ? MagazineCardWidget(
+                            magazine: mag,
+                            onTap: () => _launchUrl(mag.url ?? 'https://daikichi-ir.com/magazine/'),
+                          )
+                        : const NoMagazineCard(),
+                    loading: () => const MagazineCardSkeleton(),
+                    error: (error, stack) => _buildMagazineErrorCard(ref),
+                  ),
+
+                  const SizedBox(height: 80),
+                ],
               ),
-              error: (error, stack) => SliverToBoxAdapter(
-                child: _buildBlogErrorCard('ブログの読み込みに失敗しました', error.toString(), ref),
-              ),
             ),
-            
-            // スペース
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 24),
-            ),
-            
-            // マガジンセクション
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: magazine.when(
-                  data: (mag) => mag != null 
-                      ? MagazineCardWidget(
-                          magazine: mag,
-                          onTap: () => _launchMagazine(mag.url),
-                        )
-                      : const NoMagazineCard(),
-                  loading: () => const MagazineCardSkeleton(),
-                  error: (error, stack) => _buildMagazineErrorCard('マガジンの読み込みに失敗しました', error.toString(), ref),
-                ),
-              ),
-            ),
-            
-            // ボトムスペース
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 24),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildBlogErrorCard(String message, String errorDetails, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.red[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.red[200]!),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 48,
-              color: Colors.red[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.red[700],
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'データベースへの接続に問題が発生している可能性があります',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.red[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.invalidate(blogListProvider);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[600],
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('再試行'),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _launchUrl(String urlString) async {
+    try {
+      final Uri url = Uri.parse(urlString);
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $urlString');
+      }
+    } catch (e) {
+      print('URL起動エラー: $e');
+    }
   }
 
-  Widget _buildMagazineErrorCard(String message, String errorDetails, WidgetRef ref) {
+  Widget _buildMagazineErrorCard(WidgetRef ref) {
     return Container(
       width: double.infinity,
-      height: 180, // 200から180に縮小
+      height: 180,
       decoration: BoxDecoration(
         color: Colors.red[50],
         borderRadius: BorderRadius.circular(12),
@@ -193,20 +182,20 @@ class MagazineScreen extends HookConsumerWidget {
         children: [
           Icon(
             Icons.error_outline,
-            size: 40, // 48から40に縮小
+            size: 40,
             color: Colors.red[400],
           ),
-          const SizedBox(height: 12), // 16から12に縮小
+          const SizedBox(height: 12),
           Text(
-            message,
+            'マガジンの読み込みに失敗しました',
             style: TextStyle(
-              fontSize: 14, // 16から14に縮小
+              fontSize: 16,
               color: Colors.red[700],
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12), // 16から12に縮小
+          const SizedBox(height: 12),
           ElevatedButton(
             onPressed: () {
               ref.invalidate(magazineProvider);
@@ -214,39 +203,11 @@ class MagazineScreen extends HookConsumerWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[600],
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
-            child: const Text(
-              '再試行',
-              style: TextStyle(fontSize: 14),
-            ),
+            child: const Text('再試行'),
           ),
         ],
       ),
     );
-  }
-
-  void _navigateToBlogDetail(BuildContext context, BlogMagazine blog) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MagazineDetailScreen(blog: blog),
-      ),
-    );
-  }
-
-  void _launchMagazine(String? url) async {
-    if (url == null || url.isEmpty) {
-      return;
-    }
-    
-    final uri = Uri.parse(url);
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      print('URL起動エラー: $e');
-    }
   }
 }

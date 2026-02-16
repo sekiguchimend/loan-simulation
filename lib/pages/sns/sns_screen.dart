@@ -92,68 +92,101 @@ class SnsScreen extends HookConsumerWidget {
                       ),
                     ),
                   ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
 
-            // Xボタン
-            _buildSnsButton(
-              context: context,
-              url: 'https://x.com/daikichi_ir_com',
-              platformName: 'X',
-              backgroundImage: 'assets/images/logo_x.png',
-              colors: [
-                const Color(0xFF000000),
-                const Color(0xFF333333),
+            // 2列グリッドでSNSボタンを表示
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              childAspectRatio: 1.25,
+              children: [
+                // Xボタン
+                _buildSnsButton(
+                  context: context,
+                  url: 'https://x.com/daikichi_ir_com',
+                  platformName: 'X',
+                  backgroundImage: 'assets/images/logo_x.png',
+                  colors: [
+                    const Color(0xFF000000),
+                    const Color(0xFF333333),
+                  ],
+                  icon: FontAwesomeIcons.xTwitter,
+                  opacity: 0.5,
+                ),
+
+                // YouTubeボタン
+                _buildSnsButton(
+                  context: context,
+                  url: 'https://www.youtube.com/@daikichi-ir',
+                  platformName: 'YouTube',
+                  backgroundImage: 'assets/images/logo_youtube.png',
+                  colors: [
+                    const Color(0xFFD32F2F),
+                    const Color(0xFFC62828),
+                  ],
+                  icon: FontAwesomeIcons.youtube,
+                  opacity: 0.95,
+                ),
+
+                // LINEボタン
+                _buildSnsButton(
+                  context: context,
+                  url: 'https://line.me/R/ti/p/@daikichi',
+                  platformName: 'LINE',
+                  backgroundImage: 'assets/images/line.png',
+                  colors: [
+                    const Color(0xFF06C755),
+                    const Color(0xFF00B140),
+                  ],
+                  icon: FontAwesomeIcons.line,
+                  opacity: 0.95,
+                ),
+
+                // Facebookボタン
+                _buildSnsButton(
+                  context: context,
+                  url: 'https://www.facebook.com/daikichi.ir',
+                  platformName: 'Facebook',
+                  backgroundImage: 'assets/images/logo_facebook.png',
+                  colors: [
+                    const Color(0xFF4267B2),
+                    const Color(0xFF365899),
+                  ],
+                  icon: FontAwesomeIcons.facebookF,
+                  opacity: 0.95,
+                ),
+
+                // TikTokボタン
+                _buildSnsButton(
+                  context: context,
+                  url: 'https://www.tiktok.com/@daikichi.ir',
+                  platformName: 'TikTok',
+                  backgroundImage: 'assets/images/box1.png',
+                  colors: [
+                    const Color(0xFF000000),
+                    const Color(0xFF333333),
+                  ],
+                  icon: FontAwesomeIcons.tiktok,
+                  opacity: 0.5,
+                ),
+
+                // Instagramボタン
+                _buildSnsButton(
+                  context: context,
+                  url: 'https://www.instagram.com/daikichi.ir/',
+                  platformName: 'Instagram',
+                  backgroundImage: 'assets/images/box1.png',
+                  colors: [
+                    const Color(0xFF833AB4),
+                    const Color(0xFFF77737),
+                  ],
+                  icon: FontAwesomeIcons.instagram,
+                  opacity: 0.95,
+                ),
               ],
-              icon: FontAwesomeIcons.xTwitter,
-              opacity: 0.5,
-            ),
-
-            const SizedBox(height: 4),
-
-            // YouTubeボタン
-            _buildSnsButton(
-              context: context,
-              url: 'https://www.youtube.com/@daikichi-ir',
-              platformName: 'YouTube',
-              backgroundImage: 'assets/images/logo_youtube.png',
-              colors: [
-                const Color(0xFFD32F2F),
-                const Color(0xFFC62828),
-              ],
-              icon: FontAwesomeIcons.youtube,
-              opacity: 0.95,
-            ),
-
-            const SizedBox(height: 4),
-
-            // LINEボタン
-            _buildSnsButton(
-              context: context,
-              url: 'https://line.me/R/ti/p/@daikichi',
-              platformName: 'LINE',
-              backgroundImage: 'assets/images/line.png',
-              colors: [
-                const Color(0xFF06C755),
-                const Color(0xFF00B140),
-              ],
-              icon: FontAwesomeIcons.line,
-              opacity: 0.95,
-            ),
-
-            const SizedBox(height: 4),
-
-            // Facebookボタン
-            _buildSnsButton(
-              context: context,
-              url: 'https://www.facebook.com/daikichi.ir',
-              platformName: 'Facebook',
-              backgroundImage: 'assets/images/logo_facebook.png',
-              colors: [
-                const Color(0xFF4267B2),
-                const Color(0xFF365899),
-              ],
-              icon: FontAwesomeIcons.facebookF,
-              opacity: 0.95,
             ),
 
             const SizedBox(height: 80),
@@ -175,11 +208,8 @@ class SnsScreen extends HookConsumerWidget {
     required IconData icon,
     double opacity = 0.9,
   }) {
-    const buttonHeight = 140.0;
-
     return Container(
       width: double.infinity,
-      height: buttonHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(0),
       ),
@@ -191,7 +221,7 @@ class SnsScreen extends HookConsumerWidget {
             Positioned.fill(
               child: Image.asset(
                 backgroundImage,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: colors[0],
@@ -215,21 +245,21 @@ class SnsScreen extends HookConsumerWidget {
 
             // 中央のアイコンとテキスト
             Center(
-              child: Column(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   FaIcon(
                     icon,
                     color: Colors.white,
-                    size: 28,
+                    size: 20,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(width: 8),
                   Text(
                     platformName,
                     style: TextStyle(
                       fontFamily: 'NotoSansJP',
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
