@@ -32,9 +32,9 @@ class KnowleageTileWidget extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 画像部分（左端にぴったり配置、1:1のアスペクト比）
+                // 画像部分（左端にぴったり配置、16:9のアスペクト比）
                 Container(
-                  width: 88, // 高さと同じにして1:1の比率（88x88の正方形）
+                  width: 88 * 16 / 9, // 16:9の比率（高さ88に対して幅約156）
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                   ),
