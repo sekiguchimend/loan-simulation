@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../providers/sns_providers.dart';
 
 class ConsultScreen extends HookConsumerWidget {
   const ConsultScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final snsLinksAsync = ref.watch(snsLinksProvider);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -202,75 +205,29 @@ class ConsultScreen extends HookConsumerWidget {
                   // SNSボタングリッド（縦幅半分）
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 4,
-                      crossAxisSpacing: 4,
-                      childAspectRatio: 2.5,
-                      children: [
-                        _buildSnsButton(
-                          context: context,
-                          url: 'https://x.com/daikichi_ir_com',
-                          platformName: 'X',
-                          colors: [
-                            const Color(0xFF000000),
-                            const Color(0xFF333333),
-                          ],
-                          icon: FontAwesomeIcons.xTwitter,
-                        ),
-                        _buildSnsButton(
-                          context: context,
-                          url: 'https://www.youtube.com/@daikichi-ir',
-                          platformName: 'YouTube',
-                          colors: [
-                            const Color(0xFFD32F2F),
-                            const Color(0xFFC62828),
-                          ],
-                          icon: FontAwesomeIcons.youtube,
-                        ),
-                        _buildSnsButton(
-                          context: context,
-                          url: 'https://line.me/R/ti/p/@daikichi',
-                          platformName: 'LINE',
-                          colors: [
-                            const Color(0xFF06C755),
-                            const Color(0xFF00B140),
-                          ],
-                          icon: FontAwesomeIcons.line,
-                        ),
-                        _buildSnsButton(
-                          context: context,
-                          url: 'https://www.facebook.com/daikichi.ir',
-                          platformName: 'Facebook',
-                          colors: [
-                            const Color(0xFF4267B2),
-                            const Color(0xFF365899),
-                          ],
-                          icon: FontAwesomeIcons.facebookF,
-                        ),
-                        _buildSnsButton(
-                          context: context,
-                          url: 'https://www.tiktok.com/@daikichi.ir',
-                          platformName: 'TikTok',
-                          colors: [
-                            const Color(0xFF000000),
-                            const Color(0xFF333333),
-                          ],
-                          icon: FontAwesomeIcons.tiktok,
-                        ),
-                        _buildSnsButton(
-                          context: context,
-                          url: 'https://www.instagram.com/daikichi.ir/',
-                          platformName: 'Instagram',
-                          colors: [
-                            const Color(0xFF833AB4),
-                            const Color(0xFFF77737),
-                          ],
-                          icon: FontAwesomeIcons.instagram,
-                        ),
-                      ],
+                    child: snsLinksAsync.when(
+                      data: (links) => GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        mainAxisSpacing: 4,
+                        crossAxisSpacing: 4,
+                        childAspectRatio: 2.5,
+                        children: links
+                            .where((link) => _platformConfigs.containsKey(link.platform))
+                            .map((link) {
+                          final config = _platformConfigs[link.platform]!;
+                          return _buildSnsButton(
+                            context: context,
+                            url: link.url,
+                            platformName: config.name,
+                            colors: config.colors,
+                            icon: config.icon,
+                          );
+                        }).toList(),
+                      ),
+                      loading: () => const Center(child: CircularProgressIndicator()),
+                      error: (_, __) => const SizedBox.shrink(),
                     ),
                   ),
 
@@ -344,6 +301,16 @@ class ConsultScreen extends HookConsumerWidget {
     );
   }
 
+  // プラットフォームごとの表示設定
+  static const _platformConfigs = {
+    'x': _ConsultPlatformConfig('X', FontAwesomeIcons.xTwitter, [Color(0xFF000000), Color(0xFF333333)]),
+    'youtube': _ConsultPlatformConfig('YouTube', FontAwesomeIcons.youtube, [Color(0xFFD32F2F), Color(0xFFC62828)]),
+    'line': _ConsultPlatformConfig('LINE', FontAwesomeIcons.line, [Color(0xFF06C755), Color(0xFF00B140)]),
+    'facebook': _ConsultPlatformConfig('Facebook', FontAwesomeIcons.facebookF, [Color(0xFF4267B2), Color(0xFF365899)]),
+    'tiktok': _ConsultPlatformConfig('TikTok', FontAwesomeIcons.tiktok, [Color(0xFF000000), Color(0xFF333333)]),
+    'instagram': _ConsultPlatformConfig('Instagram', FontAwesomeIcons.instagram, [Color(0xFF833AB4), Color(0xFFF77737)]),
+  };
+
   Future<void> _launchUrl(String urlString) async {
     try {
       final Uri url = Uri.parse(urlString);
@@ -354,4 +321,12 @@ class ConsultScreen extends HookConsumerWidget {
       print('URL起動エラー: $e');
     }
   }
+}
+
+class _ConsultPlatformConfig {
+  final String name;
+  final IconData icon;
+  final List<Color> colors;
+
+  const _ConsultPlatformConfig(this.name, this.icon, this.colors);
 }

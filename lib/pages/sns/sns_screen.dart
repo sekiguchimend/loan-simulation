@@ -2,12 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../providers/sns_providers.dart';
 
 class SnsScreen extends HookConsumerWidget {
   const SnsScreen({super.key});
 
+  // プラットフォームごとの表示設定
+  static const _platformConfigs = {
+    'x': _PlatformConfig('X', FontAwesomeIcons.xTwitter, 'assets/images/logo_x.png', [Color(0xFF000000), Color(0xFF333333)], 0.5),
+    'youtube': _PlatformConfig('YouTube', FontAwesomeIcons.youtube, 'assets/images/logo_youtube.png', [Color(0xFFD32F2F), Color(0xFFC62828)], 0.95),
+    'line': _PlatformConfig('LINE', FontAwesomeIcons.line, 'assets/images/line.png', [Color(0xFF06C755), Color(0xFF00B140)], 0.95),
+    'facebook': _PlatformConfig('Facebook', FontAwesomeIcons.facebookF, 'assets/images/logo_facebook.png', [Color(0xFF4267B2), Color(0xFF365899)], 0.95),
+    'tiktok': _PlatformConfig('TikTok', FontAwesomeIcons.tiktok, 'assets/images/box1.png', [Color(0xFF000000), Color(0xFF333333)], 0.5),
+    'instagram': _PlatformConfig('Instagram', FontAwesomeIcons.instagram, 'assets/images/box1.png', [Color(0xFF833AB4), Color(0xFFF77737)], 0.95),
+  };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final snsLinksAsync = ref.watch(snsLinksProvider);
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 700;
     final topSpacing = isSmallScreen ? 16.0 : 40.0;
@@ -95,98 +107,31 @@ class SnsScreen extends HookConsumerWidget {
             const SizedBox(height: 20),
 
             // 2列グリッドでSNSボタンを表示
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              childAspectRatio: 1.25,
-              children: [
-                // Xボタン
-                _buildSnsButton(
-                  context: context,
-                  url: 'https://x.com/daikichi_ir_com',
-                  platformName: 'X',
-                  backgroundImage: 'assets/images/logo_x.png',
-                  colors: [
-                    const Color(0xFF000000),
-                    const Color(0xFF333333),
-                  ],
-                  icon: FontAwesomeIcons.xTwitter,
-                  opacity: 0.5,
-                ),
-
-                // YouTubeボタン
-                _buildSnsButton(
-                  context: context,
-                  url: 'https://www.youtube.com/@daikichi-ir',
-                  platformName: 'YouTube',
-                  backgroundImage: 'assets/images/logo_youtube.png',
-                  colors: [
-                    const Color(0xFFD32F2F),
-                    const Color(0xFFC62828),
-                  ],
-                  icon: FontAwesomeIcons.youtube,
-                  opacity: 0.95,
-                ),
-
-                // LINEボタン
-                _buildSnsButton(
-                  context: context,
-                  url: 'https://line.me/R/ti/p/@daikichi',
-                  platformName: 'LINE',
-                  backgroundImage: 'assets/images/line.png',
-                  colors: [
-                    const Color(0xFF06C755),
-                    const Color(0xFF00B140),
-                  ],
-                  icon: FontAwesomeIcons.line,
-                  opacity: 0.95,
-                ),
-
-                // Facebookボタン
-                _buildSnsButton(
-                  context: context,
-                  url: 'https://www.facebook.com/daikichi.ir',
-                  platformName: 'Facebook',
-                  backgroundImage: 'assets/images/logo_facebook.png',
-                  colors: [
-                    const Color(0xFF4267B2),
-                    const Color(0xFF365899),
-                  ],
-                  icon: FontAwesomeIcons.facebookF,
-                  opacity: 0.95,
-                ),
-
-                // TikTokボタン
-                _buildSnsButton(
-                  context: context,
-                  url: 'https://www.tiktok.com/@daikichi.ir',
-                  platformName: 'TikTok',
-                  backgroundImage: 'assets/images/box1.png',
-                  colors: [
-                    const Color(0xFF000000),
-                    const Color(0xFF333333),
-                  ],
-                  icon: FontAwesomeIcons.tiktok,
-                  opacity: 0.5,
-                ),
-
-                // Instagramボタン
-                _buildSnsButton(
-                  context: context,
-                  url: 'https://www.instagram.com/daikichi.ir/',
-                  platformName: 'Instagram',
-                  backgroundImage: 'assets/images/box1.png',
-                  colors: [
-                    const Color(0xFF833AB4),
-                    const Color(0xFFF77737),
-                  ],
-                  icon: FontAwesomeIcons.instagram,
-                  opacity: 0.95,
-                ),
-              ],
+            snsLinksAsync.when(
+              data: (links) => GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                childAspectRatio: 1.25,
+                children: links
+                    .where((link) => _platformConfigs.containsKey(link.platform))
+                    .map((link) {
+                  final config = _platformConfigs[link.platform]!;
+                  return _buildSnsButton(
+                    context: context,
+                    url: link.url,
+                    platformName: config.name,
+                    backgroundImage: config.backgroundImage,
+                    colors: config.colors,
+                    icon: config.icon,
+                    opacity: config.opacity,
+                  );
+                }).toList(),
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => const SizedBox.shrink(),
             ),
 
             const SizedBox(height: 80),
@@ -370,4 +315,14 @@ class SpeechBubblePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class _PlatformConfig {
+  final String name;
+  final IconData icon;
+  final String backgroundImage;
+  final List<Color> colors;
+  final double opacity;
+
+  const _PlatformConfig(this.name, this.icon, this.backgroundImage, this.colors, this.opacity);
 }
