@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../providers/knowledge_providers.dart';
 import 'widgets/knowleage_tile_widget.dart';
+import 'knowledge_detail_screen.dart';
 
 class KnowleageScreen extends HookConsumerWidget {
   const KnowleageScreen({super.key});
@@ -118,9 +119,18 @@ class KnowleageScreen extends HookConsumerWidget {
                         imageUrl: column.imageUrl ?? '',
                         category: column.category, // 後方互換性プロパティを使用
                         onTap: () {
-                          // URLが設定されている場合は外部リンクを開く
                           if (column.url != null && column.url!.isNotEmpty) {
+                            // 外部リンクURLが設定されている場合は外部ブラウザで開く
                             _launchUrl(column.url!);
+                          } else {
+                            // 記事詳細画面へ遷移
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => KnowledgeDetailScreen(
+                                  column: column,
+                                ),
+                              ),
+                            );
                           }
                         },
                       );
