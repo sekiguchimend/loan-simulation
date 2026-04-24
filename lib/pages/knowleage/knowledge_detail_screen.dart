@@ -123,7 +123,9 @@ class KnowledgeDetailScreen extends HookConsumerWidget {
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedIndex: 2,
         onTap: (index) {
-          if (index != 2) {
+          if (index == 2) {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          } else {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                 builder: (context) => HomePage(initialIndex: index),
