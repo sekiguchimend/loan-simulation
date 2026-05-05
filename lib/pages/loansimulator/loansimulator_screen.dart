@@ -159,13 +159,15 @@ class LoanSimulatorScreen extends HookConsumerWidget {
       if (!isLoanMode.value) return;
 
       if (loanStep.value == 3) {
-        // 結果表示後、最初に戻る
+        // 結果の支払額を電卓モードに引き継ぐ
+        isLoanMode.value = false;
         loanStep.value = 0;
         loanAmount.value = null;
         interestRate.value = null;
         loanYears.value = null;
         monthlyPaymentResult.value = null;
-        display.value = '0';
+        previousValue.value = null;
+        operation.value = null;
         isNewInput.value = true;
         return;
       }

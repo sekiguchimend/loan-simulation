@@ -176,7 +176,7 @@ class OverviewScreen extends HookConsumerWidget {
                         const SizedBox(height: 24),
                         // 挨拶文
                         const Text(
-                          '私が考える不動産とは、不動産投資を通じて経済的に少しでも豊かになる。自分や家族が安心して暮らすための住宅があれば心が豊かになる。と「物」と「心」の両面を豊かにしてくれるものであるはずだと考えています。',
+                          '大吉不動産株式会社は、不動産投資で失敗する人を少しでも減らしたいという思いから生まれた会社です。',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -186,7 +186,7 @@ class OverviewScreen extends HookConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'しかし、不動産業界では昔から騙した騙されたの話が後を絶ちません。',
+                          '不動産投資は、うまく活用できれば資産形成の大きな力になります。一方で、誰かに紹介されたからと目的や資金計画が曖昧なまま、物件を購入してしまうと、想定外の返済負担や空室、修繕費などに悩まされることもあります。',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -196,7 +196,27 @@ class OverviewScreen extends HookConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          '弊社ではお客様の不動産購入の失敗を無くしたい、物心の両面で豊かになっていただきたい。という思いで不動産取引、物件に価値の追求をします。全従業員が毎日感謝を忘れず、自分や自社だけ損得勘定だけではなく、人としてどうか、お客様はどうなのかという思いで業務にあたるとともに、お取引に関わる全ての方に「大吉」になっていただけるよう努めてまいります。',
+                          '一棟物件が良いのか、区分マンションが良いのか、今は買わない方が良いのか。正解は、お客様の目的・自己資金・使える融資・取れるリスクによって変わります。',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF323232),
+                            height: 1.8,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          '私たちは、特定の物件を一方的におすすめするのではなく、お客様の目的を整理し、融資・自己資金・リスクを踏まえたうえで、無理のない不動産投資の進め方を一緒に考えます。',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF323232),
+                            height: 1.8,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'まずは一度お気軽にご相談ください。大吉不動産は、お客様が不動産を通じて「物」と「心」の両面で豊かになれるよう、誠実な取引を大切にしています。',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
